@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f59e0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MisGastos" />
+  <meta name="description" content="Control de gastos personales con Google Sheets" />
+
+  <title>MisGastos 💸</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- Apple touch icons -->
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" />
+
+  <!-- React + Babel + Recharts via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+    body {
+      background: #0f172a;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+    input, select, button { font-family: inherit; }
+    input:focus, select:focus { outline: none; }
+
+    @keyframes slideIn { from { transform:translateY(-12px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    @keyframes fadeUp  { from { transform:translateY(20px);  opacity:0; } to { transform:translateY(0); opacity:1; } }
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes pulse   { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+
+    /* Safe area para notch/island iPhone */
+    .safe-top    { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+    const {
+      BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+      ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
+    } = Recharts;
+
+    // ── Constantes ────────────────────────────────────────────
+    const CATEGORIES = [
+      { id:"gasolina",        label:"Gasolina",       icon:"⛽", color:"#f59e0b" },
+      { id:"mercado",         label:"Mercado",         icon:"🛒", color:"#10b981" },
+      { id:"luz",             label:"Luz",             icon:"💡", color:"#fbbf24" },
+      { id:"agua",            label:"Agua",            icon:"💧", color:"#38bdf8" },
+      { id:"internet",        label:"Internet",        icon:"📡", color:"#818cf8" },
+      { id:"administracion",  label:"Administración",  icon:"🏢", color:"#a78bfa" },
+      { id:"restaurante",     label:"Restaurante",     icon:"🍽️", color:"#fb923c" },
+      { id:"salud",           label:"Salud",           icon:"🏥", color:"#34d399" },
+      { id:"transporte",      label:"Transporte",      icon:"🚗", color:"#60a5fa" },
+      { id:"entretenimiento", label:"Entretenimiento", icon:"🎬", color:"#f472b6" },
+      { id:"ropa",            label:"Ropa",            icon:"👗", color:"#c084fc" },
+      { id:"otro",            label:"Otro",            icon:"📦", color:"#94a3b8" },
+    ];
+    const MONTHS_ES   = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    const fmt         = n => new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(n);
+    const fmtShort    = n => { if(n>=1e6) return `$${(n/1e6).toFixed(1)}M`; if(n>=1e3) return `$${(n/1e3).toFixed(0)}K`; return `$${n}`; };
+    const todayStr    = () => new Date().toISOString().split("T")[0];
+    const nowStr      = () => new Date().toLocaleString("es-CO",{dateStyle:"short",timeStyle:"short"});
+    const URL_KEY     = "misgastos_script_url";
+
+    // ── Tooltip ───────────────────────────────────────────────
+    const CTooltip = ({active,payload,label}) => {
+      if(!active||!payload?.length) return null;
+      return (
+        <div style={{background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"10px 16px",fontSize:13,color:"#f1f5f9"}}>
+          <div style={{fontWeight:700,marginBottom:4}}>{label}</div>
+          {payload.map((p,i)=><div key={i} style={{color:p.color||"#f1f5f9"}}>{p.name}: <strong>{fmtShort(p.value)}</strong></div>)}
+        </div>
+      );
+    };
+
+    // ════════════════════════════════════════════════════════
+    function App() {
+      const [gastos,setGastos]           = useState([]);
+      const [loading,setLoading]         = useState(true);
+      const [scriptUrl,setScriptUrl]     = useState("");
+      const [urlInput,setUrlInput]       = useState("");
+      const [selected,setSelected]       = useState(null);
+      const [amount,setAmount]           = useState("");
+      const [desc,setDesc]               = useState("");
+      const [saving,setSaving]           = useState(false);
+      const [syncing,setSyncing]         = useState(false);
+      const [toast,setToast]             = useState(null);
+      const [tab,setTab]                 = useState("registro");
+      const [fMonth,setFMonth]           = useState(new Date().getMonth());
+      const [fYear,setFYear]             = useState(new Date().getFullYear());
+      const [delConfirm,setDelConfirm]   = useState(null);
+      const [showCfg,setShowCfg]         = useState(false);
+
+      useEffect(()=>{
+        const url = localStorage.getItem(URL_KEY);
+        if(url){ setScriptUrl(url); setUrlInput(url); fetchGastos(url).then(()=>setLoading(false)); }
+        else setLoading(false);
+      },[]);
+
+      const fetchGastos = async (url) => {
+        if(!url) return;
+        setSyncing(true);
+        try {
+          const res  = await fetch(`${url}?t=${Date.now()}`);
+          const data = await res.json();
+          if(data.gastos) setGastos([...data.gastos].reverse());
+        } catch { showToast("Error conectando con Google Sheets","error"); }
+        setSyncing(false);
+      };
+
+      const saveUrl = () => {
+        const url = urlInput.trim();
+        if(!url.startsWith("https://script.google.com")) return showToast("URL inválida","error");
+        localStorage.setItem(URL_KEY, url);
+        setScriptUrl(url);
+        setShowCfg(false);
+        showToast("✅ Conectado con Google Sheets");
+        fetchGastos(url);
+      };
+
+      const showToast = (msg,type="success") => {
+        setToast({msg,type});
+        setTimeout(()=>setToast(null),3500);
+      };
+
+      const handleRegister = async () => {
+        if(!scriptUrl)  return showToast("Configura tu Google Sheet ⚙️","error");
+        if(!selected)   return showToast("Selecciona una categoría","error");
+        const val = parseFloat(amount.replace(/[^0-9.]/g,""));
+        if(!val||val<=0) return showToast("Ingresa un valor válido","error");
+        setSaving(true);
+        const cat = CATEGORIES.find(c=>c.id===selected);
+        const nuevo = { id:Date.now(), fecha:todayStr(), fechaHora:nowStr(),
+          categoria:selected, label:cat.label, icon:cat.icon, color:cat.color,
+          monto:val, descripcion:desc.trim()||cat.label };
+        try {
+          const res  = await fetch(scriptUrl,{method:"POST",body:JSON.stringify({accion:"add",gasto:nuevo})});
+          const data = await res.json();
+          if(data.ok){ setGastos(p=>[nuevo,...p]); setAmount(""); setDesc(""); setSelected(null); showToast(`${cat.icon} ${fmt(val)} guardado ✅`); }
+          else showToast("Error al guardar","error");
+        } catch { showToast("Error de conexión","error"); }
+        setSaving(false);
+      };
+
+      const handleDelete = async (id) => {
+        try {
+          const res  = await fetch(scriptUrl,{method:"POST",body:JSON.stringify({accion:"delete",id})});
+          const data = await res.json();
+          if(data.ok){ setGastos(p=>p.filter(g=>g.id!==id)); showToast("Gasto eliminado","error"); }
+        } catch { showToast("Error al eliminar","error"); }
+        setDelConfirm(null);
+      };
+
+      // ── Datos filtrados ──────────────────────────────────
+      const gf = gastos.filter(g=>{ const d=new Date(g.fecha+"T12:00:00"); return d.getMonth()===fMonth&&d.getFullYear()===fYear; });
+      const total = gf.reduce((s,g)=>s+g.monto,0);
+
+      const pieData = CATEGORIES.map(cat=>({
+        name:cat.label, value:gf.filter(g=>g.categoria===cat.id).reduce((s,g)=>s+g.monto,0),
+        color:cat.color, icon:cat.icon,
+      })).filter(d=>d.value>0).sort((a,b)=>b.value-a.value);
+
+      const barData = pieData.map(d=>({ name:d.name.length>9?d.name.slice(0,9)+"…":d.name, monto:d.value, color:d.color }));
+
+      const lineData = Array.from({length:6},(_,i)=>{
+        const d=new Date(fYear,fMonth-5+i,1), m=d.getMonth(), y=d.getFullYear();
+        return { mes:MONTHS_ES[m], total:gastos.filter(g=>{const gd=new Date(g.fecha+"T12:00:00");return gd.getMonth()===m&&gd.getFullYear()===y;}).reduce((s,g)=>s+g.monto,0) };
+      });
+
+      const years=[...new Set(gastos.map(g=>new Date(g.fecha+"T12:00:00").getFullYear()))];
+      if(!years.includes(fYear)) years.push(fYear);
+      years.sort((a,b)=>b-a);
+
+      // ── Sin URL → pantalla setup ─────────────────────────
+      if(loading) return (
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0f172a"}}>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:52,marginBottom:16,animation:"pulse 1.5s infinite"}}>💸</div>
+            <div style={{color:"#64748b",fontSize:15}}>Iniciando MisGastos…</div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div style={{minHeight:"100vh",background:"#0f172a",color:"#f1f5f9",paddingBottom:80}}>
+
+          {/* ── MODAL CONFIG ─────────────────────────────── */}
+          {showCfg && (
+            <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.85)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+              <div style={{background:"#1e293b",borderRadius:20,padding:28,width:"100%",maxWidth:480,border:"1px solid #334155",animation:"fadeUp .3s ease"}}>
+                <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:18,fontWeight:700,marginBottom:6}}>⚙️ Google Sheet URL</div>
+                <div style={{fontSize:13,color:"#64748b",marginBottom:20,lineHeight:1.7}}>
+                  Pega aquí el URL de tu <strong style={{color:"#f1f5f9"}}>Apps Script Web App</strong>.<br/>
+                  (Extensiones → Apps Script → Implementar → Web App)
+                </div>
+                <input value={urlInput} onChange={e=>setUrlInput(e.target.value)}
+                  placeholder="https://script.google.com/macros/s/..."
+                  style={{width:"100%",background:"#0f172a",border:"2px solid #334155",borderRadius:12,padding:"14px 16px",fontSize:13,color:"#f1f5f9",marginBottom:16}}
+                  onFocus={e=>e.target.style.borderColor="#f59e0b"}
+                  onBlur={e=>e.target.style.borderColor="#334155"} />
+                <div style={{display:"flex",gap:10}}>
+                  <button onClick={()=>setShowCfg(false)} style={{flex:1,padding:14,background:"#334155",border:"none",borderRadius:12,color:"#94a3b8",fontSize:14,fontWeight:600,cursor:"pointer"}}>Cancelar</button>
+                  <button onClick={saveUrl} style={{flex:2,padding:14,background:"linear-gradient(135deg,#f59e0b,#d97706)",border:"none",borderRadius:12,color:"#000",fontSize:14,fontWeight:700,cursor:"pointer"}}>✅ Guardar y Conectar</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── HEADER ───────────────────────────────────── */}
+          <div className="safe-top" style={{background:"linear-gradient(135deg,#1e293b,#0f172a)",borderBottom:"1px solid #1e293b",padding:"20px 20px 0",position:"sticky",top:0,zIndex:50}}>
+            <div style={{maxWidth:640,margin:"0 auto"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+                <div>
+                  <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:22,fontWeight:700,letterSpacing:-.5}}>💸 MisGastos</div>
+                  <div style={{display:"flex",alignItems:"center",gap:6,marginTop:3}}>
+                    <div style={{width:7,height:7,borderRadius:"50%",background:scriptUrl?"#10b981":"#ef4444",animation:syncing?"pulse 1s infinite":"none"}}/>
+                    <span style={{fontSize:11,color:scriptUrl?"#10b981":"#ef4444"}}>
+                      {!scriptUrl?"Sin configurar":syncing?"Sincronizando…":"Sheets conectado"}
+                    </span>
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <select value={fMonth} onChange={e=>setFMonth(+e.target.value)}
+                    style={{background:"#1e293b",border:"1px solid #334155",color:"#f1f5f9",borderRadius:8,padding:"6px 8px",fontSize:12,cursor:"pointer"}}>
+                    {MONTHS_ES.map((m,i)=><option key={i} value={i}>{m}</option>)}
+                  </select>
+                  <select value={fYear} onChange={e=>setFYear(+e.target.value)}
+                    style={{background:"#1e293b",border:"1px solid #334155",color:"#f1f5f9",borderRadius:8,padding:"6px 8px",fontSize:12,cursor:"pointer"}}>
+                    {years.map(y=><option key={y} value={y}>{y}</option>)}
+                  </select>
+                  {scriptUrl && <button onClick={()=>fetchGastos(scriptUrl)} style={{background:"#1e293b",border:"1px solid #334155",borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:15}} title="Sincronizar">
+                    <span style={syncing?{display:"inline-block",animation:"spin 1s linear infinite"}:{}}>{syncing?"⟳":"🔄"}</span>
+                  </button>}
+                  <button onClick={()=>setShowCfg(true)} style={{background:"#1e293b",border:"1px solid #334155",borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:15}} title="Configurar">⚙️</button>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:4}}>
+                {[["registro","✏️ Registrar"],["graficas","📊 Gráficas"],["historial","📋 Historial"]].map(([id,lbl])=>(
+                  <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"10px 0",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,background:"none",color:tab===id?"#f59e0b":"#64748b",borderBottom:`2px solid ${tab===id?"#f59e0b":"transparent"}`,transition:"all .2s"}}>{lbl}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div style={{maxWidth:640,margin:"0 auto",padding:"20px 16px"}}>
+
+            {/* Sin URL → onboarding */}
+            {!scriptUrl && (
+              <div style={{padding:"20px 0",animation:"fadeUp .4s ease"}}>
+                <div style={{textAlign:"center",marginBottom:32}}>
+                  <div style={{fontSize:64,marginBottom:12}}>📊</div>
+                  <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:22,fontWeight:700,marginBottom:8}}>Conecta tu Google Sheet</div>
+                  <div style={{color:"#64748b",fontSize:14,lineHeight:1.7}}>Guarda tus gastos en la nube<br/>accesibles desde cualquier dispositivo</div>
+                </div>
+                <button onClick={()=>setShowCfg(true)} style={{width:"100%",padding:"18px",background:"linear-gradient(135deg,#f59e0b,#d97706)",border:"none",borderRadius:14,color:"#000",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'Space Grotesk',sans-serif",marginBottom:28}}>
+                  ⚙️ Configurar Google Sheet
+                </button>
+                <div style={{fontSize:13,fontWeight:700,color:"#64748b",marginBottom:14,letterSpacing:.5}}>PASOS RÁPIDOS</div>
+                {[
+                  ["1","Abre tu Google Sheet → Extensiones → Apps Script"],
+                  ["2","Pega el código del archivo Code.gs y guarda"],
+                  ["3","Implementar → Nueva implementación → Aplicación web"],
+                  ["4","Acceso: Cualquier persona → Copia la URL"],
+                  ["5","Pega la URL aquí y listo ✅"],
+                ].map(([n,txt])=>(
+                  <div key={n} style={{display:"flex",gap:14,alignItems:"flex-start",background:"#1e293b",borderRadius:12,padding:"14px 16px",marginBottom:8}}>
+                    <div style={{width:26,height:26,borderRadius:"50%",background:"#f59e0b22",border:"1.5px solid #f59e0b",color:"#f59e0b",fontSize:12,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</div>
+                    <div style={{fontSize:13,color:"#94a3b8",lineHeight:1.6}}>{txt}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {scriptUrl && <>
+              {/* ── RESUMEN ──────────────────────────────── */}
+              <div style={{background:"linear-gradient(135deg,#f59e0b,#d97706)",borderRadius:16,padding:"20px 24px",marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",animation:"fadeUp .4s ease"}}>
+                <div>
+                  <div style={{fontSize:12,fontWeight:600,color:"rgba(0,0,0,.6)",marginBottom:4}}>TOTAL {MONTHS_ES[fMonth].toUpperCase()} {fYear}</div>
+                  <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:30,fontWeight:700,color:"#000",letterSpacing:-1}}>{fmt(total)}</div>
+                  <div style={{fontSize:12,color:"rgba(0,0,0,.5)",marginTop:4}}>{gf.length} transacciones</div>
+                </div>
+                {pieData[0] && <div style={{textAlign:"right"}}>
+                  <div style={{fontSize:11,color:"rgba(0,0,0,.5)",marginBottom:2}}>Mayor gasto</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#000"}}>{pieData[0].icon} {pieData[0].name}</div>
+                  <div style={{fontSize:13,color:"rgba(0,0,0,.7)"}}>{fmtShort(pieData[0].value)}</div>
+                </div>}
+              </div>
+
+              {/* ══ REGISTRO ════════════════════════════ */}
+              {tab==="registro" && <div style={{animation:"fadeUp .35s ease"}}>
+                <div style={{fontSize:13,fontWeight:600,color:"#64748b",marginBottom:14,letterSpacing:.5}}>CATEGORÍA</div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9,marginBottom:22}}>
+                  {CATEGORIES.map(cat=>(
+                    <button key={cat.id} onClick={()=>setSelected(cat.id===selected?null:cat.id)} style={{background:selected===cat.id?`${cat.color}22`:"#1e293b",border:`2px solid ${selected===cat.id?cat.color:"#334155"}`,borderRadius:14,padding:"13px 6px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:5,transition:"all .15s",transform:selected===cat.id?"scale(1.05)":"scale(1)"}}>
+                      <span style={{fontSize:24}}>{cat.icon}</span>
+                      <span style={{fontSize:10,fontWeight:600,color:selected===cat.id?cat.color:"#94a3b8",textAlign:"center",lineHeight:1.2}}>{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{marginBottom:14}}>
+                  <div style={{fontSize:12,color:"#64748b",marginBottom:8,fontWeight:500}}>VALOR ($)</div>
+                  <div style={{position:"relative"}}>
+                    <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",color:"#f59e0b",fontWeight:700,fontSize:18}}>$</span>
+                    <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0"
+                      style={{width:"100%",background:"#1e293b",border:"2px solid #334155",borderRadius:12,padding:"15px 15px 15px 34px",fontSize:22,color:"#f1f5f9",fontWeight:700,fontFamily:"'Space Grotesk',sans-serif",transition:"border .2s"}}
+                      onFocus={e=>e.target.style.borderColor="#f59e0b"}
+                      onBlur={e=>e.target.style.borderColor="#334155"} />
+                  </div>
+                </div>
+
+                <div style={{marginBottom:18}}>
+                  <div style={{fontSize:12,color:"#64748b",marginBottom:8,fontWeight:500}}>DESCRIPCIÓN (opcional)</div>
+                  <input type="text" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Ej: Tanqueada viernes, Recibo agosto…"
+                    style={{width:"100%",background:"#1e293b",border:"2px solid #334155",borderRadius:12,padding:"13px 15px",fontSize:14,color:"#f1f5f9",transition:"border .2s"}}
+                    onFocus={e=>e.target.style.borderColor="#f59e0b"}
+                    onBlur={e=>e.target.style.borderColor="#334155"} />
+                </div>
+
+                <div style={{display:"flex",alignItems:"center",gap:8,background:"#1e293b",borderRadius:10,padding:"11px 14px",marginBottom:18}}>
+                  <span style={{fontSize:16}}>📅</span>
+                  <div>
+                    <div style={{fontSize:10,color:"#475569"}}>FECHA AUTOMÁTICA</div>
+                    <div style={{fontSize:13,fontWeight:600,color:"#94a3b8"}}>{nowStr()}</div>
+                  </div>
+                  <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:"#10b981"}}/>
+                    <span style={{fontSize:10,color:"#10b981"}}>Google Sheets</span>
+                  </div>
+                </div>
+
+                <button onClick={handleRegister} disabled={saving} style={{width:"100%",padding:"17px",border:"none",borderRadius:14,background:saving?"#334155":"linear-gradient(135deg,#f59e0b,#d97706)",color:saving?"#64748b":"#000",fontSize:16,fontWeight:700,cursor:saving?"not-allowed":"pointer",fontFamily:"'Space Grotesk',sans-serif",transition:"all .2s"}}>
+                  {saving?"⏳ Guardando en Sheets…":"✅ Registrar Gasto"}
+                </button>
+
+                {gastos.slice(0,3).length>0 && <div style={{marginTop:26}}>
+                  <div style={{fontSize:12,color:"#475569",fontWeight:600,marginBottom:10,letterSpacing:.5}}>ÚLTIMOS REGISTROS</div>
+                  {gastos.slice(0,3).map(g=>(
+                    <div key={g.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#1e293b",borderRadius:12,padding:"13px 14px",marginBottom:8,borderLeft:`3px solid ${g.color}`}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{fontSize:20}}>{g.icon}</span>
+                        <div>
+                          <div style={{fontWeight:600,fontSize:13}}>{g.descripcion}</div>
+                          <div style={{fontSize:11,color:"#475569"}}>{g.fechaHora}</div>
+                        </div>
+                      </div>
+                      <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,color:g.color,fontSize:14}}>{fmt(g.monto)}</div>
+                    </div>
+                  ))}
+                </div>}
+              </div>}
+
+              {/* ══ GRÁFICAS ════════════════════════════ */}
+              {tab==="graficas" && <div style={{animation:"fadeUp .35s ease"}}>
+                {gf.length===0 ? (
+                  <div style={{textAlign:"center",padding:"60px 20px",color:"#475569"}}>
+                    <div style={{fontSize:48,marginBottom:10}}>📊</div>
+                    <div style={{fontSize:16,fontWeight:600}}>Sin datos este mes</div>
+                  </div>
+                ) : <>
+                  <div style={{background:"#1e293b",borderRadius:16,padding:"18px 14px",marginBottom:14}}>
+                    <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>📊 Por Categoría</div>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={barData} margin={{top:0,right:0,left:-20,bottom:0}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155"/>
+                        <XAxis dataKey="name" tick={{fill:"#64748b",fontSize:10}}/>
+                        <YAxis tickFormatter={fmtShort} tick={{fill:"#64748b",fontSize:10}}/>
+                        <Tooltip content={<CTooltip/>}/>
+                        <Bar dataKey="monto" radius={[6,6,0,0]}>
+                          {barData.map((e,i)=><Cell key={i} fill={e.color}/>)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div style={{background:"#1e293b",borderRadius:16,padding:"18px 14px",marginBottom:14,display:"flex",gap:14}}>
+                    <div style={{flexShrink:0}}>
+                      <div style={{fontSize:13,fontWeight:700,marginBottom:8}}>🥧 Distribución</div>
+                      <PieChart width={150} height={150}>
+                        <Pie data={pieData} cx={70} cy={70} innerRadius={40} outerRadius={65} paddingAngle={3} dataKey="value">
+                          {pieData.map((e,i)=><Cell key={i} fill={e.color}/>)}
+                        </Pie>
+                        <Tooltip formatter={v=>fmtShort(v)}/>
+                      </PieChart>
+                    </div>
+                    <div style={{flex:1,overflowY:"auto",maxHeight:160}}>
+                      {pieData.map((d,i)=>(
+                        <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                          <div style={{display:"flex",alignItems:"center",gap:5}}>
+                            <div style={{width:7,height:7,borderRadius:"50%",background:d.color,flexShrink:0}}/>
+                            <span style={{fontSize:11,color:"#94a3b8"}}>{d.icon} {d.name}</span>
+                          </div>
+                          <span style={{fontSize:11,fontWeight:700,color:d.color}}>{fmtShort(d.value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{background:"#1e293b",borderRadius:16,padding:"18px 14px",marginBottom:14}}>
+                    <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>📈 Tendencia 6 Meses</div>
+                    <ResponsiveContainer width="100%" height={170}>
+                      <LineChart data={lineData} margin={{top:0,right:0,left:-20,bottom:0}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155"/>
+                        <XAxis dataKey="mes" tick={{fill:"#64748b",fontSize:11}}/>
+                        <YAxis tickFormatter={fmtShort} tick={{fill:"#64748b",fontSize:10}}/>
+                        <Tooltip content={<CTooltip/>}/>
+                        <Line type="monotone" dataKey="total" stroke="#f59e0b" strokeWidth={3} dot={{fill:"#f59e0b",r:4}} name="Total"/>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div style={{background:"#1e293b",borderRadius:16,padding:"18px 18px",marginBottom:14}}>
+                    <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>🏆 Top Categorías</div>
+                    {pieData.slice(0,5).map((d,i)=>(
+                      <div key={i} style={{marginBottom:12}}>
+                        <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                          <span style={{fontSize:13}}>{d.icon} {d.name}</span>
+                          <span style={{fontSize:13,fontWeight:700,color:d.color}}>{fmtShort(d.value)}</span>
+                        </div>
+                        <div style={{background:"#0f172a",borderRadius:99,height:5,overflow:"hidden"}}>
+                          <div style={{height:"100%",background:d.color,borderRadius:99,width:`${(d.value/total*100).toFixed(1)}%`,transition:"width 1s ease"}}/>
+                        </div>
+                        <div style={{fontSize:10,color:"#475569",marginTop:2}}>{(d.value/total*100).toFixed(1)}% del total</div>
+                      </div>
+                    ))}
+                  </div>
+                </>}
+              </div>}
+
+              {/* ══ HISTORIAL ═══════════════════════════ */}
+              {tab==="historial" && <div style={{animation:"fadeUp .35s ease"}}>
+                <div style={{fontSize:13,fontWeight:600,color:"#64748b",marginBottom:14}}>{gf.length} REGISTROS — {MONTHS_ES[fMonth]} {fYear}</div>
+                {gf.length===0 ? (
+                  <div style={{textAlign:"center",padding:"60px 20px",color:"#475569"}}>
+                    <div style={{fontSize:48,marginBottom:10}}>📋</div>
+                    <div style={{fontSize:16,fontWeight:600}}>Sin registros este mes</div>
+                  </div>
+                ) : <>
+                  {gf.map(g=>(
+                    <div key={g.id} style={{background:"#1e293b",borderRadius:14,padding:"13px 14px",marginBottom:10,borderLeft:`3px solid ${g.color}`,display:"flex",alignItems:"center",justifyContent:"space-between",animation:"slideIn .25s ease"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10,flex:1}}>
+                        <span style={{fontSize:22}}>{g.icon}</span>
+                        <div>
+                          <div style={{fontWeight:600,fontSize:13}}>{g.descripcion}</div>
+                          <div style={{fontSize:10,color:"#475569",marginTop:2}}>
+                            <span style={{background:`${g.color}22`,color:g.color,borderRadius:4,padding:"1px 5px",fontWeight:600,fontSize:9}}>{g.label}</span>
+                            {"  "}{g.fechaHora}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,color:g.color,fontSize:14}}>{fmt(g.monto)}</div>
+                        {delConfirm===g.id ? (
+                          <div style={{display:"flex",gap:4}}>
+                            <button onClick={()=>handleDelete(g.id)} style={{background:"#ef4444",border:"none",borderRadius:6,padding:"4px 9px",color:"#fff",fontSize:12,cursor:"pointer",fontWeight:700}}>✓</button>
+                            <button onClick={()=>setDelConfirm(null)} style={{background:"#334155",border:"none",borderRadius:6,padding:"4px 9px",color:"#94a3b8",fontSize:12,cursor:"pointer"}}>✗</button>
+                          </div>
+                        ) : (
+                          <button onClick={()=>setDelConfirm(g.id)} style={{background:"none",border:"none",cursor:"pointer",color:"#475569",fontSize:17,padding:4}}>🗑️</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{background:"linear-gradient(135deg,#f59e0b22,#d9770622)",border:"1px solid #f59e0b44",borderRadius:14,padding:"15px 18px",marginTop:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontWeight:700,color:"#94a3b8",fontSize:13}}>TOTAL DEL MES</span>
+                    <span style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:22,fontWeight:700,color:"#f59e0b"}}>{fmt(total)}</span>
+                  </div>
+                </>}
+              </div>}
+            </>}
+          </div>
+
+          {/* ── TOAST ──────────────────────────────────── */}
+          {toast && (
+            <div style={{position:"fixed",bottom:28,left:"50%",transform:"translateX(-50%)",background:toast.type==="error"?"#ef4444":"#10b981",color:"#fff",borderRadius:12,padding:"12px 22px",fontWeight:600,fontSize:14,zIndex:100,whiteSpace:"nowrap",boxShadow:"0 8px 32px rgba(0,0,0,.5)",animation:"slideIn .3s ease"}}>
+              {toast.msg}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+    // ── Registrar Service Worker ──────────────────────────
+    if("serviceWorker" in navigator){
+      window.addEventListener("load", ()=>{
+        navigator.serviceWorker.register("./sw.js")
+          .then(()=>console.log("✅ SW registrado"))
+          .catch(e=>console.log("SW error:",e));
+      });
+    }
+  </script>
+</body>
+</html>
