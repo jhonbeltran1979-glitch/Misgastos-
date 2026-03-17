@@ -122,7 +122,7 @@ let fm=new Date().getMonth(),fy=new Date().getFullYear(),tTimer=null;
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(n);
 const fmtS=n=>n>=1e6?`$${(n/1e6).toFixed(1)}M`:n>=1e3?`$${(n/1e3).toFixed(0)}K`:`$${n}`;
-const hoy=()=>new Date().toISOString().split("T")[0];
+const hoy=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 const ahora=()=>new Date().toLocaleString("es-CO",{dateStyle:"short",timeStyle:"short"});
 
 function toast(msg,t="ok"){
@@ -158,9 +158,16 @@ function saveUrl(){
   toast("✅ Conectado con Google Sheets"); fetchGastos(u);
 }
 
+function parseDate(f){
+  try{
+    const s=String(f||"").trim();
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.substring(0,10)+"T12:00:00");
+    return new Date(s);
+  }catch{return new Date();}
+}
 function gf(){
   return gastos.filter(g=>{
-    const d=new Date(g.fecha+"T12:00:00");
+    const d=parseDate(g.fecha);
     return d.getMonth()===fm&&d.getFullYear()===fy;
   });
 }
@@ -168,7 +175,7 @@ function gf(){
 function buildSel(){
   const sm=$("sel-m"),sy=$("sel-y");
   sm.innerHTML=MES.map((m,i)=>`<option value="${i}"${i===fm?" selected":""}>${m}</option>`).join("");
-  const yrs=[...new Set(gastos.map(g=>new Date(g.fecha+"T12:00:00").getFullYear()))];
+  const yrs=[...new Set(gastos.map(g=>parseDate(g.fecha).getFullYear()))];
   if(!yrs.includes(fy))yrs.push(fy); yrs.sort((a,b)=>b-a);
   sy.innerHTML=yrs.map(y=>`<option value="${y}"${y===fy?" selected":""}>${y}</option>`).join("");
   sm.onchange=e=>{fm=+e.target.value;render();};
@@ -309,7 +316,7 @@ function renderG(){
   // Línea 6 meses
   const ld=Array.from({length:6},(_,i)=>{
     const d=new Date(fy,fm-5+i,1),m=d.getMonth(),y=d.getFullYear();
-    return{mes:MES[m],v:gastos.filter(g=>{const gd=new Date(g.fecha+"T12:00:00");return gd.getMonth()===m&&gd.getFullYear()===y;}).reduce((s,g)=>s+g.monto,0)};
+    return{mes:MES[m],v:gastos.filter(g=>{const gd=parseDate(g.fecha);return gd.getMonth()===m&&gd.getFullYear()===y;}).reduce((s,g)=>s+g.monto,0)};
   });
   const lW=300,lH=110,maxL=Math.max(...ld.map(d=>d.v),1);
   const pts=ld.map((d,i)=>({x:20+i*(lW-40)/5,y:lH-8-Math.round((d.v/maxL)*(lH-18)),d}));
