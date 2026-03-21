@@ -445,8 +445,10 @@ function render(){
 
 // Init
 (async()=>{
-  const u=localStorage.getItem(URLK);
-  if(u){url=u;setConn(true,true);$("btn-sync").onclick=()=>fetchGastos(url);await fetchGastos(u);}
+  const FIXED_URL="https://script.google.com/macros/s/AKfycbxEkO_kQM6i3zb1C93oZ8aKT6lpBzxR7j4d_9HdNRV1_IFF1h1D2lJC1WZEEPlXHb53mg/exec";
+  const u=localStorage.getItem(URLK)||FIXED_URL;
+  localStorage.setItem(URLK,u);
+  url=u; setConn(true,true); $("btn-sync").onclick=()=>fetchGastos(url); await fetchGastos(u);
   render();
 })();
 
