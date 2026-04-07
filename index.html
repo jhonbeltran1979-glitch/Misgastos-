@@ -65,6 +65,7 @@
         <button class="tab-btn" id="t-g" onclick="setTab('g')">📊 Gráficas</button>
         <button class="tab-btn" id="t-h" onclick="setTab('h')">📋 Historial</button>
         <button class="tab-btn" id="t-p" onclick="setTab('p')">🏦 Ahorros</button>
+        <button class="tab-btn" id="t-i" onclick="setTab('i')">💵 Ingresos</button>
       </div>
     </div>
   </div>
@@ -82,6 +83,7 @@
     <div id="pnl-g" class="fade" style="display:none"></div>
     <div id="pnl-h" class="fade" style="display:none"></div>
     <div id="pnl-p" class="fade" style="display:none"></div>
+    <div id="pnl-i" class="fade" style="display:none"></div>
     <div id="pnl-setup" style="display:none"></div>
   </div>
 </div>
@@ -546,9 +548,146 @@ function renderP(){
   `;
 }
 
-function setTab(t){
+// ── Ingresos ─────────────────────────────────────────────
+const ING_KEY = "misgastos_ingresos";
+
+function getIngresos(){
+  try{ return JSON.parse(localStorage.getItem(ING_KEY)||"[]"); }catch{ return []; }
+}
+function saveIngresos(d){ localStorage.setItem(ING_KEY, JSON.stringify(d)); }
+
+function agregarIngreso(){
+  const nombre = $("ing-nombre").value.trim();
+  const monto  = parseFloat($("ing-monto").value.replace(/[^0-9.]/g,""));
+  const icon   = $("ing-icon").value || "💵";
+  if(!nombre) return toast("Escribe el nombre de la fuente","err");
+  if(!monto||monto<=0) return toast("Ingresa un monto válido","err");
+  const lista = getIngresos();
+  lista.push({ id:Date.now(), nombre, monto, icon });
+  saveIngresos(lista);
+  $("ing-nombre").value="";
+  $("ing-monto").value="";
+  $("ing-icon").value="💵";
+  toast(`✅ ${nombre} agregado`);
+  renderI();
+}
+
+function eliminarIngreso(id){
+  const lista = getIngresos().filter(i=>i.id!==id);
+  saveIngresos(lista);
+  renderI();
+}
+
+function renderI(){
+  const el=$("pnl-i");
+  const lista=getIngresos();
+  const totalIngresos=lista.reduce((s,i)=>s+i.monto,0);
+  const totalGastosMes=gastos.filter(g=>{
+    const d=parseDate(g.fecha);
+    return d.getMonth()===fm&&d.getFullYear()===fy;
+  }).reduce((s,g)=>s+g.monto,0);
+  const totalProv=PROVISIONES.reduce((a,p)=>a+p.mensual,0);
+  const disponible=totalIngresos-totalGastosMes-totalProv;
+  const ICONOS=["💵","💰","🏢","💻","🚗","📦","🎯","🏪","📈","🎓","🔧","💎"];
+
+  el.innerHTML=`
+    <!-- Card resumen -->
+    <div style="background:linear-gradient(135deg,#065f46,#0f172a);border-radius:16px;padding:20px 24px;margin-bottom:20px;border:1px solid #10b98122">
+      <div style="font-size:12px;font-weight:600;color:rgba(110,231,183,.7);margin-bottom:4px">INGRESOS MENSUALES</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:#fff;letter-spacing:-1px">${fmt(totalIngresos)}</div>
+      <div style="display:flex;gap:16px;margin-top:14px">
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:rgba(110,231,183,.6);margin-bottom:3px">GASTOS MES</div>
+          <div style="font-size:15px;font-weight:700;color:#ef4444">${fmt(totalGastosMes)}</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:rgba(110,231,183,.6);margin-bottom:3px">PROVISIONES</div>
+          <div style="font-size:15px;font-weight:700;color:#f59e0b">${fmt(totalProv)}</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:rgba(110,231,183,.6);margin-bottom:3px">DISPONIBLE</div>
+          <div style="font-size:15px;font-weight:700;color:${disponible>=0?"#10b981":"#ef4444"}">${fmt(disponible)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario agregar -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:14px;letter-spacing:.5px">NUEVA FUENTE DE INGRESO</div>
+      
+      <!-- Selector de ícono -->
+      <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:500">ÍCONO</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${ICONOS.map(ic=>`
+          <button onclick="$('ing-icon').value='${ic}';document.querySelectorAll('.icon-sel').forEach(b=>b.style.background='#0f172a');this.style.background='#f59e0b22';this.style.borderColor='#f59e0b'"
+            class="icon-sel"
+            style="width:40px;height:40px;border-radius:10px;border:2px solid #334155;background:#0f172a;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .15s">
+            ${ic}
+          </button>`).join("")}
+      </div>
+      <input type="hidden" id="ing-icon" value="💵"/>
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:500">NOMBRE</div>
+        <input id="ing-nombre" type="text" class="inp" placeholder="Ej: Salario, Freelance, Arriendo…"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:500">MONTO MENSUAL ($)</div>
+        <div style="position:relative">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#10b981;font-weight:700;font-size:18px">$</span>
+          <input id="ing-monto" type="number" class="inp" placeholder="0" style="padding-left:34px;font-size:20px;font-weight:700;font-family:'Space Grotesk',sans-serif"/>
+        </div>
+      </div>
+      <button onclick="agregarIngreso()" style="width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif">
+        ➕ Agregar Fuente
+      </button>
+    </div>
+
+    <!-- Lista fuentes -->
+    <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:14px;letter-spacing:.5px">${lista.length} FUENTES REGISTRADAS</div>
+    ${!lista.length?`
+      <div style="text-align:center;padding:40px 20px;color:#475569">
+        <div style="font-size:48px;margin-bottom:10px">💵</div>
+        <div style="font-size:15px;font-weight:600">Agrega tu primera fuente de ingreso</div>
+      </div>`
+    : lista.map(i=>`
+      <div style="background:#1e293b;border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:3px solid #10b981;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:26px">${i.icon}</span>
+          <div>
+            <div style="font-weight:600;font-size:14px">${i.nombre}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">Mensual · ${fmt(i.monto*12)}/año</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#10b981;font-size:16px">${fmt(i.monto)}</div>
+          <button onclick="eliminarIngreso(${i.id})" style="background:none;border:none;cursor:pointer;color:#475569;font-size:17px;padding:4px">🗑️</button>
+        </div>
+      </div>`).join("")}
+
+    ${lista.length?`
+    <div style="background:linear-gradient(135deg,#10b98122,#05966922);border:1px solid #10b98144;border-radius:14px;padding:15px 18px;margin-top:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-weight:700;color:#94a3b8;font-size:13px">BALANCE DEL MES</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;margin-bottom:6px">
+        <span>💵 Ingresos</span><span style="color:#10b981;font-weight:700">${fmt(totalIngresos)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;margin-bottom:6px">
+        <span>💸 Gastos</span><span style="color:#ef4444;font-weight:700">-${fmt(totalGastosMes)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;margin-bottom:10px">
+        <span>🏦 Provisiones</span><span style="color:#f59e0b;font-weight:700">-${fmt(totalProv)}</span>
+      </div>
+      <div style="border-top:1px solid #334155;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:#f1f5f9;font-size:14px">DISPONIBLE</span>
+        <span style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:${disponible>=0?"#10b981":"#ef4444"}">${fmt(disponible)}</span>
+      </div>
+    </div>`:""}
+  `;
+}
   tab=t;
-  ["r","g","h","p"].forEach(id=>{
+  ["r","g","h","p","i"].forEach(id=>{
     $("t-"+id).classList.toggle("active",id===t);
     $("pnl-"+id).style.display=id===t&&url?"block":"none";
   });
@@ -557,6 +696,7 @@ function setTab(t){
     if(t==="g")renderG();
     if(t==="h")renderH();
     if(t==="p")renderP();
+    if(t==="i")renderI();
   }
 }
 
@@ -565,12 +705,13 @@ function render(){
   renderResumen();
   const hasUrl=!!url;
   $("pnl-setup").style.display=hasUrl?"none":"block";
-  ["r","g","h","p"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
+  ["r","g","h","p","i"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
   if(hasUrl){
     if(tab==="r")renderR();
     if(tab==="g")renderG();
     if(tab==="h")renderH();
     if(tab==="p")renderP();
+    if(tab==="i")renderI();
   } else renderSetup();
 }
 
