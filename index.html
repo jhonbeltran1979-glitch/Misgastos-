@@ -60,12 +60,12 @@
           <button onclick="openCfg()" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:15px">⚙️</button>
         </div>
       </div>
-      <div style="display:flex;gap:4px">
-        <button class="tab-btn active" id="t-r" onclick="setTab('r')">✏️ Registrar</button>
-        <button class="tab-btn" id="t-g" onclick="setTab('g')">📊 Gráficas</button>
-        <button class="tab-btn" id="t-h" onclick="setTab('h')">📋 Historial</button>
-        <button class="tab-btn" id="t-p" onclick="setTab('p')">🏦 Ahorros</button>
-        <button class="tab-btn" id="t-i" onclick="setTab('i')">💵 Ingresos</button>
+      <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <button class="tab-btn active" id="t-r" onclick="setTab('r')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">✏️ Registrar</button>
+        <button class="tab-btn" id="t-g" onclick="setTab('g')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">📊 Gráficas</button>
+        <button class="tab-btn" id="t-h" onclick="setTab('h')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">📋 Historial</button>
+        <button class="tab-btn" id="t-p" onclick="setTab('p')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">🏦 Ahorros</button>
+        <button class="tab-btn" id="t-i" onclick="setTab('i')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">💵 Ingresos</button>
       </div>
     </div>
   </div>
