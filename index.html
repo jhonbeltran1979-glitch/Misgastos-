@@ -686,6 +686,8 @@ function renderI(){
     </div>`:""}
   `;
 }
+
+function setTab(t){
   tab=t;
   ["r","g","h","p","i"].forEach(id=>{
     $("t-"+id).classList.toggle("active",id===t);
