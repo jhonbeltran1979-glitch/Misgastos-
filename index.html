@@ -64,6 +64,7 @@
         <button class="tab-btn active" id="t-r" onclick="setTab('r')">✏️ Registrar</button>
         <button class="tab-btn" id="t-g" onclick="setTab('g')">📊 Gráficas</button>
         <button class="tab-btn" id="t-h" onclick="setTab('h')">📋 Historial</button>
+        <button class="tab-btn" id="t-p" onclick="setTab('p')">🏦 Ahorros</button>
       </div>
     </div>
   </div>
@@ -80,6 +81,7 @@
     <div id="pnl-r" class="fade"></div>
     <div id="pnl-g" class="fade" style="display:none"></div>
     <div id="pnl-h" class="fade" style="display:none"></div>
+    <div id="pnl-p" class="fade" style="display:none"></div>
     <div id="pnl-setup" style="display:none"></div>
   </div>
 </div>
@@ -438,9 +440,115 @@ function renderSetup(){
   `;
 }
 
+// ── Provisiones ──────────────────────────────────────────
+const PROVISIONES = [
+  {id:"electrodomesticos", label:"Electrodomésticos", icon:"🏠", color:"#60a5fa", mensual:80000},
+  {id:"matricula",         label:"Matrícula Daniela", icon:"🎓", color:"#a78bfa", mensual:40000},
+  {id:"soat",              label:"SOAT",              icon:"🚗", color:"#f59e0b", mensual:100000},
+  {id:"predial",           label:"Impuesto Predial",  icon:"🏡", color:"#10b981", mensual:30000},
+  {id:"impuestocarro",     label:"Impuesto Carro",    icon:"🚙", color:"#fb923c", mensual:40000},
+  {id:"tecnomecanica",     label:"Tecnomecánica",     icon:"🔩", color:"#64748b", mensual:30000},
+  {id:"cumpleanos",        label:"Cumpleaños",        icon:"🎂", color:"#f472b6", mensual:300000},
+  {id:"imprevistos",       label:"Imprevistos",       icon:"⚡", color:"#fbbf24", mensual:200000},
+  {id:"ropa",              label:"Ropa",              icon:"👗", color:"#c084fc", mensual:150000},
+];
+const PROV_KEY = "misgastos_prov";
+
+function getProvState(){
+  try{ return JSON.parse(localStorage.getItem(PROV_KEY)||"{}"); }catch{ return {}; }
+}
+function saveProvState(s){ localStorage.setItem(PROV_KEY, JSON.stringify(s)); }
+
+function toggleProv(id){
+  const key=`${fy}-${fm}-${id}`;
+  const s=getProvState();
+  if(s[key]) delete s[key]; else s[key]=true;
+  saveProvState(s);
+  renderP();
+}
+
+function renderP(){
+  const el=$("pnl-p");
+  const s=getProvState();
+  const totalMensual=PROVISIONES.reduce((a,p)=>a+p.mensual,0);
+  const totalAnual=totalMensual*12;
+
+  // Calcular acumulado real (todos los meses marcados)
+  let acumulado=0;
+  PROVISIONES.forEach(p=>{
+    for(let m=0;m<12;m++){
+      if(s[`${fy}-${m}-${p.id}`]) acumulado+=p.mensual;
+    }
+  });
+
+  // Marcados este mes
+  const marcadosMes=PROVISIONES.filter(p=>s[`${fy}-${fm}-${p.id}`]);
+  const totalMes=marcadosMes.reduce((a,p)=>a+p.mensual,0);
+
+  el.innerHTML=`
+    <!-- Card resumen anual -->
+    <div style="background:linear-gradient(135deg,#1e40af,#1e293b);border-radius:16px;padding:20px 24px;margin-bottom:20px;border:1px solid #3b82f622">
+      <div style="font-size:12px;font-weight:600;color:rgba(147,197,253,.7);margin-bottom:4px">META ANUAL ${fy}</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:-1px">${fmt(acumulado)}</div>
+      <div style="font-size:12px;color:rgba(147,197,253,.6);margin-top:4px">de ${fmt(totalAnual)} meta anual</div>
+      <div style="background:rgba(255,255,255,.1);border-radius:99px;height:6px;overflow:hidden;margin-top:12px">
+        <div style="height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;width:${Math.min((acumulado/totalAnual*100),100).toFixed(1)}%;transition:width 1s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <span style="font-size:11px;color:rgba(147,197,253,.6)">${(acumulado/totalAnual*100).toFixed(1)}% del año</span>
+        <span style="font-size:11px;color:rgba(147,197,253,.6)">Mes: ${fmt(totalMes)} / ${fmt(totalMensual)}</span>
+      </div>
+    </div>
+
+    <!-- Mes actual -->
+    <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:14px;letter-spacing:.5px">
+      PROVISIONES ${MES[fm].toUpperCase()} ${fy} — toca para marcar ✅
+    </div>
+
+    ${PROVISIONES.map(p=>{
+      const marcado=!!s[`${fy}-${fm}-${p.id}`];
+      // Meses acumulados este año
+      let mesesAcum=0;
+      for(let m=0;m<12;m++) if(s[`${fy}-${m}-${p.id}`]) mesesAcum++;
+      const acumProv=mesesAcum*p.mensual;
+      const anualProv=p.mensual*12;
+      return `
+        <div onclick="toggleProv('${p.id}')" style="background:${marcado?p.color+"22":"#1e293b"};border:2px solid ${marcado?p.color:"#334155"};border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:28px">${p.icon}</span>
+              <div>
+                <div style="font-weight:600;font-size:14px;color:${marcado?p.color:"#f1f5f9"}">${p.label}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px">${fmt(p.mensual)}/mes · ${fmt(anualProv)}/año</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:22px">${marcado?"✅":"⭕"}</div>
+              <div style="font-size:10px;color:${marcado?p.color:"#475569"};margin-top:2px">${mesesAcum}/12 meses</div>
+            </div>
+          </div>
+          <!-- Barra progreso anual -->
+          <div style="background:#0f172a;border-radius:99px;height:4px;overflow:hidden;margin-top:10px">
+            <div style="height:100%;background:${p.color};border-radius:99px;width:${(acumProv/anualProv*100).toFixed(1)}%;transition:width .5s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:10px;color:#475569">Acumulado: ${fmt(acumProv)}</span>
+            <span style="font-size:10px;color:#475569">${(acumProv/anualProv*100).toFixed(0)}%</span>
+          </div>
+        </div>`;
+    }).join("")}
+
+    <!-- Total mensual -->
+    <div style="background:linear-gradient(135deg,#1e40af22,#3b82f622);border:1px solid #3b82f644;border-radius:14px;padding:15px 18px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;color:#94a3b8;font-size:13px">TOTAL MENSUAL</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#60a5fa">${fmt(totalMensual)}</span>
+    </div>
+  `;
+}
+
 function setTab(t){
   tab=t;
-  ["r","g","h"].forEach(id=>{
+  ["r","g","h","p"].forEach(id=>{
     $("t-"+id).classList.toggle("active",id===t);
     $("pnl-"+id).style.display=id===t&&url?"block":"none";
   });
@@ -448,6 +556,7 @@ function setTab(t){
     if(t==="r")renderR();
     if(t==="g")renderG();
     if(t==="h")renderH();
+    if(t==="p")renderP();
   }
 }
 
@@ -456,11 +565,12 @@ function render(){
   renderResumen();
   const hasUrl=!!url;
   $("pnl-setup").style.display=hasUrl?"none":"block";
-  ["r","g","h"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
+  ["r","g","h","p"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
   if(hasUrl){
     if(tab==="r")renderR();
     if(tab==="g")renderG();
     if(tab==="h")renderH();
+    if(tab==="p")renderP();
   } else renderSetup();
 }
 
