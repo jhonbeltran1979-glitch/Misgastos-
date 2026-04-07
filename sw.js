@@ -1,4 +1,4 @@
-const CACHE = "misgastos-v1";
+const CACHE = "misgastos-v3";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", e => {
