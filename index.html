@@ -38,6 +38,63 @@
     .modal{background:#1e293b;border-radius:20px;padding:28px;width:100%;max-width:480px;border:1px solid #334155}
     .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);border-radius:12px;padding:12px 22px;font-weight:600;font-size:14px;z-index:300;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none}
     select{background:#1e293b;border:1px solid #334155;color:#f1f5f9;border-radius:8px;padding:6px 8px;font-size:12px;cursor:pointer}
+    :root{color-scheme:dark;--bg:#0b1220;--surface:#151f31;--surface-raised:#1a2639;--line:#2a3850;--muted:#a0aec0;--text:#f4f7fb;--gold:#f6ad2e;--green:#26c49a}
+    html,body{background:var(--bg);color:var(--text);overscroll-behavior-y:contain}
+    button,select,input{font:inherit}
+    button{-webkit-tap-highlight-color:transparent}
+    #app>div:first-child{background:rgba(15,24,39,.94)!important;border-bottom-color:var(--line)!important;backdrop-filter:blur(18px);padding-top:max(12px,env(safe-area-inset-top))!important}
+    .tab-strip{gap:8px!important;padding-bottom:8px!important}
+    .tab-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 13px!important;border:1px solid transparent;border-radius:12px 12px 0 0;color:#9ba9bd;white-space:nowrap}
+    .tab-btn.active{color:#ffd075;background:rgba(246,173,46,.09);border-color:rgba(246,173,46,.16);border-bottom-color:var(--gold)}
+    .tab-icon{font-size:16px;line-height:1;width:31px;height:31px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(145deg,#34465c,#182538);border:1px solid #ffffff16;box-shadow:inset 1px 1px 2px #ffffff20,inset -2px -3px 4px #080e18a8,0 4px 8px #050a1280;text-shadow:0 2px 2px #0009;transform:translateY(-1px)}
+    .icon-3d{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#35475d,#19263a);border:1px solid #ffffff16;box-shadow:inset 2px 2px 3px #ffffff1e,inset -3px -4px 6px #070d18a8,0 6px 11px #050a1270;text-shadow:0 2px 3px #0009;filter:saturate(1.12);transform:translateY(-1px)}
+    .category-icon{width:44px;height:44px;flex-basis:44px;border-radius:15px;font-size:23px!important;background:linear-gradient(145deg,#2c3c52,#162236);box-shadow:inset 2px 2px 4px #ffffff20,inset -3px -4px 6px #070d18b0,0 6px 12px #03081180}
+    .tiny-icon{width:36px;height:36px;flex-basis:36px;border-radius:12px;font-size:20px!important}
+    .large-icon{width:58px;height:58px;flex-basis:58px;border-radius:20px;font-size:30px!important;margin-inline:auto}
+    .goal-icon{width:50px;height:50px;flex-basis:50px;border-radius:16px}
+    .goal-icon.large-icon{width:58px;height:58px;flex-basis:58px}
+    .fridge-art{position:relative;display:block;width:29px;height:43px;border:2px solid #7dd3fc;border-radius:6px;background:linear-gradient(100deg,#fff 0%,#e0f2fe 42%,#93c5fd 100%);box-shadow:3px 4px 7px #0009,inset 2px 0 3px #fff;transform:perspective(70px) rotateY(-7deg)}
+    .fridge-split{position:absolute;left:1px;right:1px;top:38%;height:2px;background:#3b82f6;box-shadow:0 1px #ffffffa0}
+    .fridge-handle{position:absolute;right:3px;width:3px;border-radius:3px;background:linear-gradient(90deg,#1d4ed8,#60a5fa,#fff);box-shadow:1px 1px 2px #0008}
+    .fridge-handle.top{top:12%;height:10px}.fridge-handle.bottom{top:51%;height:14px}
+    .mattress-art{position:relative;display:block;width:43px;height:35px;transform:rotate(-5deg)}
+    .mattress-top{position:absolute;left:4px;top:4px;width:36px;height:19px;border:1px solid #c4b5fd;border-radius:8px 8px 4px 4px;background:linear-gradient(145deg,#fff 0%,#e0e7ff 56%,#a5b4fc 100%);box-shadow:2px 2px 4px #0009,inset 1px 1px 2px #fff}
+    .mattress-side{position:absolute;left:4px;top:20px;width:36px;height:9px;border-radius:2px 3px 5px 5px;background:linear-gradient(90deg,#c7d2fe,#818cf8 72%,#6366f1);box-shadow:2px 3px 3px #0009}
+    .mattress-pillow{position:absolute;z-index:1;left:8px;top:7px;width:12px;height:8px;border-radius:4px;background:linear-gradient(145deg,#fff,#dbeafe);box-shadow:1px 1px 2px #64748b80}
+    .mattress-seam{position:absolute;z-index:2;left:5px;right:4px;top:23px;height:1px;background:#eef2ff;box-shadow:0 1px #4f46e580}
+    .cat-btn:hover .category-icon,.gasto-row:hover .icon-3d{transform:translateY(-3px) scale(1.04);box-shadow:inset 2px 2px 3px #ffffff24,inset -3px -4px 6px #070d18b0,0 9px 15px #030811a0}
+    .icon-sel{box-shadow:inset 2px 2px 3px #ffffff18,inset -2px -3px 4px #070d18a0,0 4px 7px #03081170!important}
+    #sel-m,#sel-y{background:#1a2639;border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--text);font-size:13px}
+    #res-card{background:linear-gradient(135deg,#1e3144,#172535)!important;border:1px solid #30465a;box-shadow:0 12px 30px #050b1470;color:var(--text)}
+    #res-tot{color:#fff!important;font-size:clamp(27px,7vw,34px)!important}
+    #res-lbl{color:#b9c7d7!important;letter-spacing:.07em}
+    #res-cnt{color:#93a7ba!important}
+    .card,.gasto-row{background:var(--surface)!important;border:1px solid rgba(148,163,184,.08);border-radius:18px}
+    .card{padding:20px}
+    .gasto-row{padding:15px;margin-bottom:10px}
+    .cat-btn{min-height:86px;background:var(--surface)!important;border-color:var(--line)!important;border-radius:16px}
+    .inp{background:var(--surface);border-color:var(--line);border-radius:14px}
+    .btn-primary{background:linear-gradient(135deg,#ffd06c,#f2a521);border-radius:15px;box-shadow:0 8px 18px #f59e0b20}
+    .modal-overlay{backdrop-filter:blur(5px)}
+    #app [style*="color:#64748b"],#app [style*="color: #64748b"]{color:#a2b1c2!important}
+    #app [style*="color:#475569"],#app [style*="color: #475569"]{color:#8999ad!important}
+    @media(max-width:640px){
+      body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+      #app>div:first-child{padding:12px 14px 0!important}
+      #app>div:first-child>div{margin-bottom:0!important}
+      .tab-strip{position:fixed;z-index:100;left:0;right:0;bottom:0;display:flex!important;gap:3px!important;padding:8px 8px calc(8px + env(safe-area-inset-bottom))!important;background:rgba(13,21,35,.97);border-top:1px solid var(--line);backdrop-filter:blur(18px);overflow:visible!important}
+      .tab-btn{min-width:0;flex:1;flex-direction:column;gap:4px;padding:7px 2px!important;border:0!important;border-radius:10px;font-size:10px;line-height:1.1}
+      .tab-btn.active{background:rgba(246,173,46,.1);border:0!important}
+      .tab-icon{font-size:19px;width:32px;height:32px}
+      .icon-3d{box-shadow:inset 2px 2px 3px #ffffff1e,inset -3px -4px 6px #070d18b0,0 5px 9px #03081170}
+      #app>div:first-child>div>div:first-child{margin-bottom:9px!important}
+      #app>div:nth-child(2){padding:14px 13px 20px!important}
+      #res-card{padding:17px 16px!important;gap:12px}
+      #res-top{text-align:right}
+      .card{padding:17px 15px}
+      #modal .modal,#modal-prov .modal{padding:22px 19px;max-height:88dvh;overflow:auto}
+    }
+    @media(min-width:641px){#app>div:nth-child(2){max-width:760px!important;padding-top:26px!important}}
   </style>
 </head>
 <body>
@@ -47,7 +104,7 @@
     <div style="max-width:640px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px">💸 MisGastos</div>
+        <div style="display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px"><span class="icon-3d tiny-icon">💸</span>MisGastos</div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
             <div id="dot" style="width:7px;height:7px;border-radius:50%;background:#ef4444"></div>
             <span id="conn-lbl" style="font-size:11px;color:#ef4444">Sin configurar</span>
@@ -60,12 +117,13 @@
           <button onclick="openCfg()" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:15px">⚙️</button>
         </div>
       </div>
-      <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
-        <button class="tab-btn active" id="t-r" onclick="setTab('r')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">✏️ Registrar</button>
-        <button class="tab-btn" id="t-g" onclick="setTab('g')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">📊 Gráficas</button>
-        <button class="tab-btn" id="t-h" onclick="setTab('h')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">📋 Historial</button>
-        <button class="tab-btn" id="t-p" onclick="setTab('p')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">🏦 Ahorros</button>
-        <button class="tab-btn" id="t-i" onclick="setTab('i')" style="white-space:nowrap;flex-shrink:0;padding:10px 14px">💵 Ingresos</button>
+      <div class="tab-strip" style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <button class="tab-btn active" id="t-r" onclick="setTab('r')"><span class="tab-icon">✏️</span><span>Registrar</span></button>
+        <button class="tab-btn" id="t-g" onclick="setTab('g')"><span class="tab-icon">📊</span><span>Análisis</span></button>
+        <button class="tab-btn" id="t-h" onclick="setTab('h')"><span class="tab-icon">📋</span><span>Historial</span></button>
+        <button class="tab-btn" id="t-b" onclick="setTab('b')"><span class="tab-icon">🧾</span><span>Presupuesto</span></button>
+        <button class="tab-btn" id="t-p" onclick="setTab('p')"><span class="tab-icon">🎯</span><span>Metas</span></button>
+        <button class="tab-btn" id="t-i" onclick="setTab('i')"><span class="tab-icon">💵</span><span>Ingresos</span></button>
       </div>
     </div>
   </div>
@@ -82,6 +140,7 @@
     <div id="pnl-r" class="fade"></div>
     <div id="pnl-g" class="fade" style="display:none"></div>
     <div id="pnl-h" class="fade" style="display:none"></div>
+    <div id="pnl-b" class="fade" style="display:none"></div>
     <div id="pnl-p" class="fade" style="display:none"></div>
     <div id="pnl-i" class="fade" style="display:none"></div>
     <div id="pnl-setup" style="display:none"></div>
@@ -112,9 +171,12 @@ const CATS=[
   {id:"agua",label:"Agua",icon:"💧",color:"#38bdf8"},
   {id:"internet",label:"Internet",icon:"📡",color:"#818cf8"},
   {id:"administracion",label:"Administ.",icon:"🏢",color:"#a78bfa"},
+  {id:"recarga_celular",label:"Recarga celular",icon:"📲",color:"#06b6d4"},
+  {id:"donacion_iglesia",label:"Donación iglesia",icon:"⛪",color:"#fbbf24"},
   {id:"restaurante",label:"Restaurante",icon:"🍽️",color:"#fb923c"},
   {id:"salud",label:"Salud",icon:"🏥",color:"#34d399"},
   {id:"transporte",label:"Transporte",icon:"🚗",color:"#60a5fa"},
+  {id:"parqueadero",label:"Parqueadero",icon:"🅿️",color:"#0ea5e9"},
   {id:"entretenimiento",label:"Entretenim.",icon:"🎬",color:"#f472b6"},
   {id:"ropa",label:"Ropa",icon:"👗",color:"#c084fc"},
   {id:"mantenimiento",label:"Mant. Carro",icon:"🔧",color:"#64748b"},
@@ -247,7 +309,7 @@ function renderR(){
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px">
       ${CATS.map(c=>`<button class="cat-btn" onclick="selCatFn('${c.id}')"
         style="border-color:${selCat===c.id?c.color:"#334155"};background:${selCat===c.id?c.color+"22":"#1e293b"};transform:${selCat===c.id?"scale(1.05)":"scale(1)"}">
-        <span style="font-size:24px">${c.icon}</span>
+        <span class="icon-3d category-icon">${c.icon}</span>
         <span style="font-size:10px;font-weight:600;text-align:center;line-height:1.2;color:${selCat===c.id?c.color:"#94a3b8"}">${c.label}</span>
       </button>`).join("")}
     </div>
@@ -280,7 +342,7 @@ function renderR(){
       ${gastos.slice(0,3).map(g=>`
         <div style="display:flex;align-items:center;justify-content:space-between;background:#1e293b;border-radius:12px;padding:13px 14px;margin-bottom:8px;border-left:3px solid ${g.color}">
           <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:20px">${g.icon}</span>
+            <span class="icon-3d tiny-icon">${g.icon}</span>
             <div>
               <div style="font-weight:600;font-size:13px">${g.descripcion}</div>
               <div style="font-size:11px;color:#475569">${g.fechaHora}</div>
@@ -292,91 +354,185 @@ function renderR(){
   `;
 }
 
+const PROYECCION_KEY="misgastos_tasa_proyeccion";
+const PROYECCION_IPC_REFERENCIA=6.24;
+function getTasaProyeccion(){
+  const guardadaRaw=localStorage.getItem(PROYECCION_KEY);
+  if(guardadaRaw===null)return PROYECCION_IPC_REFERENCIA;
+  const guardada=Number(guardadaRaw);
+  return Number.isFinite(guardada)&&guardada>=0&&guardada<=30?guardada:PROYECCION_IPC_REFERENCIA;
+}
+function guardarTasaProyeccion(){
+  const input=$("proy-tasa"), tasa=Number(input?.value);
+  if(!Number.isFinite(tasa)||tasa<0||tasa>30)return toast("Ingresa un ajuste entre 0% y 30%","err");
+  localStorage.setItem(PROYECCION_KEY,String(tasa));
+  renderG();
+  toast("✅ Proyección anual actualizada");
+}
+
 function renderG(){
-  const el=$("pnl-g"), g=gf(), tot=g.reduce((s,x)=>s+x.monto,0);
-  if(!g.length){el.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:48px;margin-bottom:10px">📊</div><div style="font-size:16px;font-weight:600">Sin datos este mes</div></div>`;return;}
-  const pd=CATS.map(c=>({name:c.label,icon:c.icon,color:c.color,v:g.filter(x=>x.categoria===c.id).reduce((s,x)=>s+x.monto,0)})).filter(d=>d.v>0).sort((a,b)=>b.v-a.v);
+  const el=$("pnl-g"), g=gf();
+  if(!g.length){el.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#64748b"><div style="font-size:48px;margin-bottom:10px">📊</div><div style="font-size:16px;font-weight:600">Sin datos para analizar</div><div style="font-size:12px;margin-top:6px">Registra gastos y vuelve a esta pestaña.</div></div>`;return;}
 
-  // Barras SVG
-  const bH=140,bPad=6, bW=Math.max(300,pd.length*44);
-  const maxV=Math.max(...pd.map(d=>d.v));
-  const bw=Math.floor((bW-bPad*(pd.length+1))/pd.length);
-  const bars=pd.map((d,i)=>{
-    const h=Math.round((d.v/maxV)*(bH-18));
-    const x=bPad+i*(bw+bPad), y=bH-h-2;
-    return `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="4" fill="${d.color}"/>
-      <text x="${x+bw/2}" y="${bH+11}" text-anchor="middle" font-size="9" fill="#64748b">${d.name.slice(0,6)}</text>
-      <text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="8" fill="${d.color}">${fmtS(d.v)}</text>`;
+  const esAhorroOT=mov=>mov.categoria==="otro"&&/ahorro|\bcdt\b/i.test(String(mov.descripcion||""));
+  const consumo=g.filter(m=>!esAhorroOT(m));
+  const totalConsumo=consumo.reduce((s,x)=>s+(Number(x.monto)||0),0);
+  const totalApartado=g.filter(esAhorroOT).reduce((s,x)=>s+(Number(x.monto)||0),0);
+  const pd=CATS.map(c=>({id:c.id,name:c.label,icon:c.icon,color:c.color,v:consumo.filter(x=>x.categoria===c.id).reduce((s,x)=>s+(Number(x.monto)||0),0)})).filter(d=>d.v>0).sort((a,b)=>b.v-a.v);
+  const tresMayores=pd.slice(0,3).reduce((s,d)=>s+d.v,0);
+  const mayor=pd[0];
+  const esMesEnCurso=fy===new Date().getFullYear()&&fm===new Date().getMonth();
+  const diaCorte=esMesEnCurso?new Date().getDate():null;
+  const descripcionesOtro=consumo.filter(m=>m.categoria==="otro").reduce((acc,m)=>{
+    const nombre=String(m.descripcion||"Sin descripción").trim()||"Sin descripción";
+    acc[nombre]=(acc[nombre]||0)+(Number(m.monto)||0);return acc;
+  },{});
+  const topOtro=Object.entries(descripcionesOtro).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const ropaFin=new Date(fy,fm,1),ropaInicio=new Date(fy,fm-6,1);
+  const ropaSeisMeses=gastos.filter(x=>x.categoria==="ropa"&&parseDate(x.fecha)>=ropaInicio&&parseDate(x.fecha)<ropaFin).reduce((s,x)=>s+(Number(x.monto)||0),0);
+  const ropaPromedio=ropaSeisMeses/6;
+
+  // Comparación horizontal por categoría, con valores y participación legibles.
+  const catPlot=pd.slice(0,7), plotW=380,rowH=34,plotH=Math.max(64,catPlot.length*rowH+12);
+  const plotLeft=132,plotRight=82,plotBarW=plotW-plotLeft-plotRight,maxCat=Math.max(...catPlot.map(d=>d.v),1);
+  const catBars=catPlot.map((d,i)=>{
+    const y=8+i*rowH, w=Math.max(2,plotBarW*d.v/maxCat), name=d.name.length>17?d.name.slice(0,16)+"…":d.name;
+    return `<g><title>${d.name}: ${fmt(d.v)}, ${(d.v/Math.max(totalConsumo,1)*100).toFixed(1)}% del consumo</title>
+      <text x="0" y="${y+15}" font-size="12" fill="#cbd5e1">${d.icon} ${name}</text>
+      <rect x="${plotLeft}" y="${y+3}" width="${plotBarW}" height="13" rx="6" fill="#0f172a"/>
+      <rect x="${plotLeft}" y="${y+3}" width="${w}" height="13" rx="6" fill="${d.color}"/>
+      <text x="${plotW}" y="${y+15}" text-anchor="end" font-size="11" fill="#f1f5f9">${fmtS(d.v)}</text></g>`;
   }).join("");
 
-  // Donut SVG
-  const cx=80,cy=80,ro=65,ri=38; let ang=-Math.PI/2;
-  const slices=pd.map(d=>{
-    const a=(d.v/tot)*Math.PI*2;
-    const x1=cx+ro*Math.cos(ang),y1=cy+ro*Math.sin(ang);
-    const x2=cx+ro*Math.cos(ang+a),y2=cy+ro*Math.sin(ang+a);
-    const xi1=cx+ri*Math.cos(ang),yi1=cy+ri*Math.sin(ang);
-    const xi2=cx+ri*Math.cos(ang+a),yi2=cy+ri*Math.sin(ang+a);
-    const lg=a>Math.PI?1:0;
-    const p=`M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${xi2},${yi2} A${ri},${ri} 0 ${lg},0 ${xi1},${yi1} Z`;
-    ang+=a;
-    return `<path d="${p}" fill="${d.color}" stroke="#0f172a" stroke-width="2"/>`;
-  }).join("");
-
-  // Línea 6 meses
+  // Tendencia mensual de consumo: los traslados a ahorro/CDT de "Otro" se apartan.
   const ld=Array.from({length:6},(_,i)=>{
     const d=new Date(fy,fm-5+i,1),m=d.getMonth(),y=d.getFullYear();
-    return{mes:MES[m],v:gastos.filter(g=>{const gd=parseDate(g.fecha);return gd.getMonth()===m&&gd.getFullYear()===y;}).reduce((s,g)=>s+g.monto,0)};
+    const movs=gastos.filter(x=>{const xd=parseDate(x.fecha);return xd.getMonth()===m&&xd.getFullYear()===y&&!esAhorroOT(x);});
+    return{mes:MES[m],parcial:y===new Date().getFullYear()&&m===new Date().getMonth(),v:movs.reduce((s,x)=>s+(Number(x.monto)||0),0)};
   });
-  const lW=300,lH=110,maxL=Math.max(...ld.map(d=>d.v),1);
-  const pts=ld.map((d,i)=>({x:20+i*(lW-40)/5,y:lH-8-Math.round((d.v/maxL)*(lH-18)),d}));
-  const poly=pts.map(p=>`${p.x},${p.y}`).join(" ");
+  const lW=380,lH=185,left=54,right=12,top=22,bottom=34,maxL=Math.max(...ld.map(d=>d.v),1);
+  const pts=ld.map((d,i)=>({x:left+i*(lW-left-right)/5,y:top+(lH-top-bottom)*(1-d.v/maxL),d}));
+  const grid=[0,.5,1].map(r=>{const y=top+(lH-top-bottom)*r;return `<line x1="${left}" y1="${y}" x2="${lW-right}" y2="${y}" stroke="#334155" stroke-width="1"/><text x="${left-7}" y="${y+4}" text-anchor="end" font-size="11" fill="#94a3b8">${fmtS(maxL*(1-r))}</text>`;}).join("");
+  const smoothLine=pts.reduce((path,p,i)=>{
+    if(i===0)return `M ${p.x},${p.y}`;
+    const prev=pts[i-1],before=pts[Math.max(0,i-2)],after=pts[Math.min(pts.length-1,i+1)],dx=p.x-prev.x;
+    const c1x=prev.x+dx/3,c1y=prev.y+(p.y-before.y)/6;
+    const c2x=p.x-dx/3,c2y=p.y-(after.y-prev.y)/6;
+    return `${path} C ${c1x},${c1y} ${c2x},${c2y} ${p.x},${p.y}`;
+  },"");
+  const actualPlan=typeof PLAN_GASTOS!=="undefined"?PLAN_GASTOS.reduce((s,p)=>s+gastoPresupuestado(p),0):0;
+  const limitePlan=typeof PLAN_GASTOS!=="undefined"?PLAN_GASTOS.reduce((s,p)=>s+planMonto(p),0):0;
+  const usoPlan=limitePlan?actualPlan/limitePlan*100:0;
 
+  // Señales concretas basadas en lo que se registró en la hoja.
+  const categoriasAlerta=typeof PLAN_GASTOS!=="undefined"?PLAN_GASTOS.map(p=>({p,real:gastoPresupuestado(p),limite:planMonto(p)})).filter(x=>x.real>0&&x.limite>0&&x.real/x.limite>=.85).sort((a,b)=>(b.real/b.limite)-(a.real/a.limite)):[];
+  const variablesIds=new Set(["otro","restaurante","ropa","entretenimiento"]);
+  const agruparVariables=lista=>{
+    const map=new Map();
+    lista.filter(m=>variablesIds.has(m.categoria)&&!esAhorroOT(m)).forEach(m=>{
+      const desc=String(m.descripcion||"Sin descripción").trim()||"Sin descripción";
+      const key=`${m.categoria}|${desc.toLocaleLowerCase("es-CO")}`;
+      const item=map.get(key)||{categoria:m.categoria,descripcion:desc,total:0,veces:0};
+      item.total+=(Number(m.monto)||0);item.veces++;map.set(key,item);
+    });
+    return [...map.values()].sort((a,b)=>b.total-a.total);
+  };
+  const comprasVariables=agruparVariables(consumo).slice(0,5);
+  const inicioPeriodo=new Date(fy,fm-5,1),finPeriodo=new Date(fy,fm+1,1);
+  const variablesSeisMeses=agruparVariables(gastos.filter(m=>{const d=parseDate(m.fecha);return d>=inicioPeriodo&&d<finPeriodo;}));
+  const repetidosPequenos=variablesSeisMeses.filter(x=>x.veces>=3&&x.total/x.veces<=100000).slice(0,5);
+  const tasaAnual=getTasaProyeccion();
+  const gastoMensualBase=typeof PLAN_GASTOS!=="undefined"?PLAN_GASTOS.reduce((s,p)=>s+planMonto(p),0):0;
+  const ahorroMensualProy=1276000;
+  const ingresoMensualProy=PLAN_INGRESO;
+  const yearNow=new Date().getFullYear();
+  const yearsProjection=Array.from({length:5},(_,i)=>{
+    const year=yearNow+i+1, factor=Math.pow(1+tasaAnual/100,i+1);
+    const gastoMes=gastoMensualBase*factor, ahorroMes=ahorroMensualProy;
+    return {year,gastoMes,ahorroMes,totalMes:gastoMes+ahorroMes,anualGasto:gastoMes*12,anualAhorro:ahorroMes*12,anualTotal:(gastoMes+ahorroMes)*12,disponible:ingresoMensualProy-gastoMes-ahorroMes};
+  });
+  const chartW=380,chartH=182,cLeft=46,cRight=14,cTop=27,cBottom=35;
+  const maxProj=Math.max(ingresoMensualProy,...yearsProjection.map(x=>x.totalMes),1)*1.08;
+  const scaleY=v=>cTop+(chartH-cTop-cBottom)*(1-v/maxProj);
+  const step=(chartW-cLeft-cRight)/yearsProjection.length, barW=Math.min(34,step*.48);
+  const incomeY=scaleY(ingresoMensualProy);
+  const projGrid=[0,.5,1].map(r=>{const v=maxProj*(1-r),y=scaleY(v);return `<line x1="${cLeft}" y1="${y}" x2="${chartW-cRight}" y2="${y}" stroke="#334155" stroke-width="1"/><text x="${cLeft-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#94a3b8">${fmtS(v)}</text>`;}).join("");
+  const projBars=yearsProjection.map((x,i)=>{
+    const bx=cLeft+step*(i+.5)-barW/2,by=scaleY(x.totalMes),bh=chartH-cBottom-by;
+    return `<g><title>${x.year}: presupuesto ${fmt(x.totalMes)}/mes, incluidos gastos y ahorro</title><rect x="${bx}" y="${by}" width="${barW}" height="${bh}" rx="5" fill="#60a5fa"/><rect x="${bx+barW/2-31}" y="${by+6}" width="62" height="21" rx="7" fill="#0f172a"/><text x="${bx+barW/2}" y="${by+21}" text-anchor="middle" font-size="11" font-weight="700" fill="#f8fafc">${fmtS(x.totalMes)}</text><text x="${bx+barW/2}" y="${chartH-9}" text-anchor="middle" font-size="11" fill="#cbd5e1">${x.year}</text></g>`;
+  }).join("");
+  const proyMeses=yearsProjection.map(x=>`<div style="background:#1e293b;border-radius:12px;padding:12px 14px;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:700;color:#bfdbfe;margin-bottom:8px">${x.year}</div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Gastos mensuales</span><b style="color:#f1f5f9">${fmt(x.gastoMes)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Metas + fondo de ropa</span><b style="color:#a78bfa">${fmt(x.ahorroMes)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Total a organizar por mes</span><b style="color:#60a5fa">${fmt(x.totalMes)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Gastos del año</span><b style="color:#f1f5f9">${fmt(x.anualGasto)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Metas + ropa del año</span><b style="color:#a78bfa">${fmt(x.anualAhorro)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8;margin-bottom:5px"><span>Presupuesto total del año</span><b style="color:#60a5fa">${fmt(x.anualTotal)}</b></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#94a3b8"><span>Margen mensual con ingreso actual</span><b style="color:${x.disponible>=0?"#10b981":"#ef4444"}">${fmt(x.disponible)}</b></div>
+  </div>`).join("");
   el.innerHTML=`
-    <div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:12px">📊 Por Categoría</div>
-      <div style="overflow-x:auto"><svg viewBox="0 0 ${bW} ${bH+14}" style="width:100%;min-width:240px">${bars}</svg></div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🧭 Lectura de ${MES[fm]} ${fy}${esMesEnCurso?` · corte día ${diaCorte}`:""}</div>
+      ${mayor?`<div style="font-size:13px;color:#cbd5e1">Mayor gasto: <b style="color:${mayor.color}">${mayor.icon} ${mayor.name}, ${fmt(mayor.v)}</b> (${(mayor.v/Math.max(totalConsumo,1)*100).toFixed(1)}% del consumo registrado).</div>`:`<div style="font-size:13px;color:#94a3b8">No hay gastos de consumo en este mes.</div>`}
+      <div style="font-size:12px;color:#94a3b8;margin-top:6px">Las 3 categorías más altas reúnen ${fmt(tresMayores)} (${(tresMayores/Math.max(totalConsumo,1)*100).toFixed(1)}% del consumo).</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:6px">Tope de categorías presupuestadas usado: ${fmt(actualPlan)} de ${fmt(limitePlan)} (${usoPlan.toFixed(0)}%).</div>
+      ${totalApartado?`<div style="font-size:11px;color:#60a5fa;margin-top:7px">${fmt(totalApartado)} en “Ahorro mensual/CDT” se separan del consumo para no contarlos como compras.</div>`:""}
+      ${esMesEnCurso?`<div style="font-size:11px;color:#64748b;margin-top:7px">El mes aún está en curso; compara estos valores con cuidado frente a meses completos.</div>`:""}
     </div>
-    <div class="card" style="display:flex;gap:12px;align-items:flex-start">
-      <div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🥧 Distribución</div>
-        <svg viewBox="0 0 160 160" width="145" height="145">
-          ${slices}
-          <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="600">${fmtS(tot)}</text>
-        </svg>
-      </div>
-      <div style="flex:1;max-height:160px;overflow-y:auto;padding-top:28px">
-        ${pd.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-          <div style="display:flex;align-items:center;gap:5px">
-            <div style="width:7px;height:7px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
-            <span style="font-size:11px;color:#94a3b8">${d.icon} ${d.name}</span>
-          </div>
-          <span style="font-size:11px;font-weight:700;color:${d.color}">${fmtS(d.v)}</span>
-        </div>`).join("")}
-      </div>
+    ${catPlot.length?`<div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Gasto por categoría · COP</div>
+      <svg role="img" aria-label="Gasto en consumo por categoría para ${MES[fm]} ${fy}; se muestran las siete categorías con mayor gasto" viewBox="0 0 ${plotW} ${plotH}" style="width:100%;height:auto">${catBars}</svg>
+    </div>`:""}
+    <div class="card" style="margin-bottom:12px;border-color:#c084fc55!important">
+      <div style="font-size:14px;font-weight:700;margin-bottom:7px">👗 Fondo de ropa · 3 personas</div>
+      <div style="font-size:12px;color:#cbd5e1;line-height:1.6">Aparta <b style="color:#c084fc">$276.000 cada mes</b> (unos $3.312.000 al año). En los últimos 6 meses completos registrados: <b>${fmt(ropaSeisMeses)}</b>, promedio <b>${fmt(ropaPromedio)}/mes</b>. Registra cada compra en Ropa; la app descuenta esos gastos del fondo acumulado.</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:7px">Ese aporte ya está trasladado de “Gastos del mes” a “Metas” para no contarlo dos veces.</div>
     </div>
-    <div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:12px">📈 Tendencia 6 Meses</div>
-      <svg viewBox="0 0 ${lW} ${lH+14}" style="width:100%">
-        <polyline points="${poly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="#f59e0b"/>`).join("")}
-        ${pts.map(p=>`<text x="${p.x}" y="${lH+10}" text-anchor="middle" font-size="9" fill="#64748b">${p.d.mes}</text>`).join("")}
-        ${pts.map(p=>p.d.v>0?`<text x="${p.x}" y="${p.y-7}" text-anchor="middle" font-size="8" fill="#f59e0b">${fmtS(p.d.v)}</text>`:``).join("")}
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:2px">📈 Consumo mensual · últimos 6 meses (COP)</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:6px">Incluye una marca * en el mes en curso.</div>
+      <svg role="img" aria-label="Tendencia de gastos de consumo en los últimos seis meses" viewBox="0 0 ${lW} ${lH+4}" style="width:100%;height:auto">
+        ${grid}<path d="${smoothLine}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        ${pts.map((p,i)=>{const labelX=i===0?p.x+10:i===pts.length-1?p.x-10:p.x;const anchor=i===0?"start":i===pts.length-1?"end":"middle";const labelY=p.y<top+22?p.y+20:Math.max(13,p.y-10);return `<g><title>${p.d.mes}${p.d.parcial?" (mes parcial)":""}: ${fmt(p.d.v)}</title><circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#f59e0b"/><text x="${labelX}" y="${labelY}" text-anchor="${anchor}" font-size="11" fill="#fbbf24">${fmtS(p.d.v)}</text><text x="${p.x}" y="${lH-5}" text-anchor="middle" font-size="11" fill="#cbd5e1">${p.d.mes}${p.d.parcial?"*":""}</text></g>`;}).join("")}
       </svg>
     </div>
-    <div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:14px">🏆 Top Categorías</div>
-      ${pd.slice(0,5).map(d=>`
-        <div style="margin-bottom:13px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px">${d.icon} ${d.name}</span>
-            <span style="font-size:13px;font-weight:700;color:${d.color}">${fmtS(d.v)}</span>
-          </div>
-          <div style="background:#0f172a;border-radius:99px;height:5px;overflow:hidden">
-            <div style="height:100%;background:${d.color};border-radius:99px;width:${(d.v/tot*100).toFixed(1)}%"></div>
-          </div>
-          <div style="font-size:10px;color:#475569;margin-top:2px">${(d.v/tot*100).toFixed(1)}% del total</div>
-        </div>`).join("")}
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">🔍 Gastos variables para revisar</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:9px">Compras de “Otro”, restaurantes, ropa y ocio agrupadas por descripción en ${MES[fm]}. Los valores muestran dónde se fue el dinero; revisa cuáles no estaban planeadas.</div>
+      ${comprasVariables.length?comprasVariables.map(x=>{const cat=CATS.find(c=>c.id===x.categoria);return `<div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid #334155;padding:9px 0;font-size:12px"><span style="min-width:0">${cat?.icon||"📦"} ${x.descripcion}<span style="display:block;color:#64748b;font-size:10px;margin-top:2px">${cat?.label||"Gasto"} · ${x.veces} ${x.veces===1?"registro":"registros"}</span></span><b style="white-space:nowrap">${fmt(x.total)}</b></div>`;}).join(""):`<div style="font-size:12px;color:#94a3b8;padding:8px 0">No hay gastos variables registrados este mes.</div>`}
+      ${repetidosPequenos.length?`<div style="border-top:1px solid #334155;padding-top:10px;margin-top:4px;font-size:12px;font-weight:700">Gastos pequeños que se repiten · últimos 6 meses</div>${repetidosPequenos.map(x=>{const cat=CATS.find(c=>c.id===x.categoria);return `<div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid #334155;padding:8px 0;font-size:11px"><span>${cat?.icon||"📦"} ${x.descripcion} · ${x.veces} veces</span><b style="white-space:nowrap">${fmt(x.total)} total</b></div>`;}).join("")}`:""}
+      <div style="font-size:10px;color:#64748b;margin-top:6px">Un gasto alto puede ser excepcional y uno pequeño puede ser necesario; esta lista sirve para ubicar movimientos y decidir qué revisar.</div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🚦 Topes próximos a agotarse</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:9px">Solo se muestran categorías que ya consumieron al menos el 85% del tope mensual.</div>
+      ${categoriasAlerta.length?categoriasAlerta.map(x=>{const pct=x.real/x.limite*100,exceso=x.real>x.limite;return `<div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:4px"><span>${x.p.label}</span><span style="color:${exceso?"#ef4444":"#fbbf24"};font-weight:700">${fmt(x.real)} / ${fmt(x.limite)} · ${pct.toFixed(0)}%</span></div>
+        <div style="height:6px;background:#0f172a;border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min(pct,100)}%;background:${exceso?"#ef4444":"#fbbf24"};border-radius:99px"></div></div>
+        <div style="font-size:11px;color:${exceso?"#fca5a5":"#64748b"};margin-top:3px">${exceso?`Supera el tope por ${fmt(x.real-x.limite)}.`:`Quedan ${fmt(x.limite-x.real)}; verifica si el gasto continuará al mismo ritmo.`}</div>
+      </div>`;}).join(""):`<div style="font-size:12px;color:#94a3b8;padding:4px 0">No hay categorías por encima del 85% de su tope.</div>`}
+    </div>
+    ${topOtro.length?`<div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🔎 Descripciones de “Otro”</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px">Úsalas para identificar y clasificar mejor las compras registradas como “Otro”.</div>
+      ${topOtro.map(([name,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;border-top:1px solid #334155;padding:8px 0;font-size:12px"><span>${name}</span><b style="white-space:nowrap">${fmt(v)}</b></div>`).join("")}
+    </div>`:""}
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:5px">🗓️ Proyección anual de presupuesto</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:12px">Proyección para los siguientes 5 años, calculada con tus topes actuales.</div>
+      <label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:5px" for="proy-tasa">Aumento anual estimado de gastos (%)</label>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:5px">
+        <input id="proy-tasa" type="number" min="0" max="30" step="0.1" value="${tasaAnual}" style="width:115px;background:#0f172a;border:1px solid #334155;border-radius:9px;padding:10px;color:#f1f5f9;font-size:16px"/>
+        <button onclick="guardarTasaProyeccion()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:0;border-radius:9px;padding:10px 13px;color:#111827;font-weight:700">Actualizar</button>
+      </div>
+      <div style="font-size:10px;color:#64748b;margin-bottom:10px">Valor inicial 6,24%: IPC anual reportado por DANE para agosto de 2026. Es referencia para el escenario y puedes cambiarla.</div>
+      <div style="font-size:12px;font-weight:600;margin:10px 0 5px">Total mensual: gastos + ahorro · línea punteada: ingreso neto actual</div>
+      <svg role="img" aria-label="Proyección del presupuesto mensual total, con gastos y ahorro, comparado con el ingreso neto actual" viewBox="0 0 ${chartW} ${chartH}" style="width:100%;height:auto">
+        ${projGrid}<line x1="${cLeft}" y1="${incomeY}" x2="${chartW-cRight}" y2="${incomeY}" stroke="#10b981" stroke-width="2" stroke-dasharray="5 4"/>${projBars}
+      </svg>
+      ${proyMeses}
+    <div style="font-size:10px;color:#64748b;line-height:1.6">Supone ingreso neto constante, $1.000.000/mes para las metas actuales más $276.000 para ropa y deuda pagada antes de 2027 si mantienes abonos de $1.000.000. No incluye gastos aún por definir (seguro del apartamento, cocina/estufa, emprendimiento e inversión) ni aumentos salariales. Los gastos se incrementan con la tasa elegida; los aportes se conservan fijos.</div>
     </div>
   `;
 }
@@ -403,7 +559,7 @@ function renderH(){
     ${!g.length?`<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:48px;margin-bottom:10px">📋</div><div style="font-size:16px;font-weight:600">Sin registros este mes</div></div>`:`
       ${g.map(x=>`<div class="gasto-row" style="border-left:3px solid ${x.color}">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span style="font-size:22px">${x.icon}</span>
+          <span class="icon-3d tiny-icon">${x.icon}</span>
           <div>
             <div style="font-weight:600;font-size:13px">${x.descripcion}</div>
             <div style="font-size:10px;color:#475569;margin-top:2px">
@@ -448,15 +604,19 @@ function renderSetup(){
 
 // ── Provisiones ──────────────────────────────────────────
 const PROVISIONES = [
-  {id:"electrodomesticos", label:"Electrodomésticos", icon:"🏠", color:"#60a5fa", mensual:80000},
+  {id:"electrodomesticos", label:"Nevera",           icon:"", color:"#60a5fa", iconHtml:'<span class="fridge-art" role="img" aria-label="Nevera"><span class="fridge-split"></span><span class="fridge-handle top"></span><span class="fridge-handle bottom"></span></span>', meta:2000000, fechaMeta:"2027-10"},
+  {id:"colchon",           label:"Colchón",          icon:"", color:"#38bdf8", iconHtml:'<span class="mattress-art" role="img" aria-label="Colchón"><span class="mattress-top"></span><span class="mattress-side"></span><span class="mattress-pillow"></span><span class="mattress-seam"></span></span>', meta:2600000, fechaMeta:"2027-10"},
+  {id:"viaje",             label:"Viaje",            icon:"✈️", color:"#f472b6", meta:2000000, fechaMeta:"2027-10"},
+  {id:"pintura",           label:"Pintura apartamento", icon:"🎨", color:"#fb923c", meta:720000, fechaMeta:"2027-10"},
   {id:"matricula",         label:"Matrícula Daniela", icon:"🎓", color:"#a78bfa", mensual:40000},
-  {id:"soat",              label:"SOAT",              icon:"🚗", color:"#f59e0b", mensual:50000},
-  {id:"predial",           label:"Impuesto Predial",  icon:"🏡", color:"#10b981", mensual:57000},
-  {id:"impuestocarro",     label:"Impuesto Carro",    icon:"🚙", color:"#fb923c", mensual:15000},
+  {id:"soat",              label:"SOAT",              icon:"🚗", color:"#f59e0b", mensual:55000},
+  {id:"predial",           label:"Impuesto Predial",  icon:"🏡", color:"#10b981", mensual:27000},
+  {id:"impuestocarro",     label:"Impuesto Carro",    icon:"🚙", color:"#fb923c", mensual:8000},
+  {id:"renta",             label:"Declaración de renta", icon:"📄", color:"#8b5cf6", mensual:14000},
   {id:"tecnomecanica",     label:"Tecnomecánica",     icon:"🔩", color:"#64748b", mensual:30000},
-  {id:"cumpleanos",        label:"Cumpleaños",        icon:"🎂", color:"#f472b6", mensual:200000},
-  {id:"imprevistos",       label:"Imprevistos",       icon:"⚡", color:"#fbbf24", mensual:200000},
-  {id:"ropa",              label:"Ropa",              icon:"👗", color:"#c084fc", mensual:150000},
+  {id:"mantenimiento_carro", label:"Mantenimiento del carro", icon:"🔧", color:"#64748b", mensual:120000},
+  {id:"imprevistos",       label:"Imprevistos",       icon:"⚡", color:"#fbbf24", mensual:96000},
+  {id:"ropa",              label:"Fondo de ropa · 3 personas", icon:"👗", color:"#c084fc", mensual:276000},
 ];
 const PROV_KEY = "misgastos_prov";
 
@@ -464,25 +624,53 @@ function getProvState(){
   try{ return JSON.parse(localStorage.getItem(PROV_KEY)||"{}"); }catch{ return {}; }
 }
 function saveProvState(s){ localStorage.setItem(PROV_KEY, JSON.stringify(s)); }
+function iconoProvision(p){return p.iconHtml||p.icon;}
+function claseIconoProvision(p){return `icon-3d${p.iconHtml?" goal-icon":""}`;}
+function acumuladoProvision(id,soloAnio=false){
+  const aportes=Object.entries(getProvState()).reduce((total,[key,value])=>{
+    const pertenece=key.endsWith(`-${id}`)&&(!soloAnio||key.startsWith(`${fy}-`));
+    return total+(pertenece?Number(value)||0:0);
+  },0);
+  if(id!=="ropa")return aportes;
+  const inicioFondo=new Date(2026,9,1);
+  const compras=gastos.filter(g=>{
+    if(g.categoria!=="ropa")return false;
+    const d=parseDate(g.fecha);
+    return d>=inicioFondo&&(!soloAnio||d.getFullYear()===fy);
+  }).reduce((s,g)=>s+(Number(g.monto)||0),0);
+  return Math.max(0,aportes-compras);
+}
+function aporteSugerido(p){
+  if(!p.meta)return p.mensual;
+  const [year,month]=p.fechaMeta.split("-").map(Number);
+  const meses=Math.max(1,(year-fy)*12+(month-1-fm));
+  const estado=getProvState();
+  const guardadoMes=Number(estado[`${fy}-${fm}-${p.id}`])||0;
+  const guardadoPrevio=Math.max(0,acumuladoProvision(p.id)-guardadoMes);
+  return Math.max(0,(p.meta-guardadoPrevio)/meses-guardadoMes);
+}
+function metaPeriodo(p){return p.meta||p.mensual*12;}
 
 function abrirModalProv(id){
   const p=PROVISIONES.find(x=>x.id===id);
   const s=getProvState();
-  const acumAnio=Object.keys(s).filter(k=>k.startsWith(`${fy}-`)&&k.endsWith(`-${id}`)).reduce((a,k)=>a+(s[k]||0),0);
+  const aporte=aporteSugerido(p);
+  const acumulado=acumuladoProvision(id,!p.meta);
+  const meta=metaPeriodo(p);
   const modal=$("modal-prov");
   modal.style.display="flex";
   modal.innerHTML=`
     <div class="modal">
-      <div style="font-size:24px;text-align:center;margin-bottom:6px">${p.icon}</div>
+      <div class="${claseIconoProvision(p)} large-icon" style="margin-bottom:12px">${iconoProvision(p)}</div>
       <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;text-align:center;margin-bottom:4px">${p.label}</div>
-      <div style="font-size:12px;color:#64748b;text-align:center;margin-bottom:20px">Meta: ${fmt(p.mensual)}/mes · ${fmt(p.mensual*12)}/año</div>
+      <div style="font-size:12px;color:#64748b;text-align:center;margin-bottom:20px">Meta: ${fmt(meta)}${p.fechaMeta?` · Para ${p.fechaMeta}`:` · ${fmt(p.mensual)}/mes`}</div>
       <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:500">¿CUÁNTO APARTASTE ESTE MES? ($)</div>
       <div style="position:relative;margin-bottom:6px">
         <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#60a5fa;font-weight:700;font-size:18px">$</span>
-        <input id="prov-inp" type="number" class="inp" placeholder="${p.mensual}" value="${s[`${fy}-${fm}-${id}`]||""}"
+        <input id="prov-inp" type="number" class="inp" placeholder="${Math.round(aporte)}" value="${s[`${fy}-${fm}-${id}`]||""}"
           style="padding-left:34px;font-size:20px;font-weight:700;font-family:'Space Grotesk',sans-serif"/>
       </div>
-      <div style="font-size:11px;color:#475569;margin-bottom:16px">Sugerido: ${fmt(p.mensual)} · Acumulado este año: ${fmt(acumAnio)}</div>
+      <div style="font-size:11px;color:#475569;margin-bottom:16px">Aporte sugerido: ${fmt(aporte)} · Acumulado: ${fmt(acumulado)}</div>
       <div style="display:flex;gap:10px;margin-bottom:10px">
         <button onclick="cerrarModalProv()" style="flex:1;padding:13px;background:#334155;border:none;border-radius:12px;color:#94a3b8;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button>
         <button onclick="guardarProv('${id}')" style="flex:2;padding:13px;background:linear-gradient(135deg,#3b82f6,#1e40af);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer">✅ Guardar</button>
@@ -516,14 +704,11 @@ function borrarProv(id){
 function renderP(){
   const el=$("pnl-p");
   const s=getProvState();
-  const totalMensual=PROVISIONES.reduce((a,p)=>a+p.mensual,0);
-  const totalAnual=totalMensual*12;
+  const totalMensual=PROVISIONES.reduce((a,p)=>a+aporteSugerido(p),0);
+  const totalAnual=PROVISIONES.reduce((a,p)=>a+metaPeriodo(p),0);
 
   // Acumulado real (suma de montos ingresados)
-  let acumulado=0;
-  PROVISIONES.forEach(p=>{
-    Object.keys(s).filter(k=>k.startsWith(`${fy}-`)&&k.endsWith(`-${p.id}`)).forEach(k=>acumulado+=s[k]||0);
-  });
+  const acumulado=PROVISIONES.reduce((a,p)=>a+acumuladoProvision(p.id,!p.meta),0);
 
   // Total mes actual
   const totalMes=PROVISIONES.reduce((a,p)=>a+(s[`${fy}-${fm}-${p.id}`]||0),0);
@@ -531,36 +716,38 @@ function renderP(){
   el.innerHTML=`
     <!-- Card resumen anual -->
     <div style="background:linear-gradient(135deg,#1e40af,#1e293b);border-radius:16px;padding:20px 24px;margin-bottom:20px;border:1px solid #3b82f622">
-      <div style="font-size:12px;font-weight:600;color:rgba(147,197,253,.7);margin-bottom:4px">AHORROS ACUMULADOS ${fy}</div>
+      <div style="font-size:12px;font-weight:600;color:rgba(147,197,253,.7);margin-bottom:4px">AHORRO ACUMULADO</div>
       <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:-1px">${fmt(acumulado)}</div>
-      <div style="font-size:12px;color:rgba(147,197,253,.6);margin-top:4px">de ${fmt(totalAnual)} meta anual</div>
+      <div style="font-size:12px;color:rgba(147,197,253,.6);margin-top:4px">de ${fmt(totalAnual)} en metas y provisiones</div>
       <div style="background:rgba(255,255,255,.1);border-radius:99px;height:6px;overflow:hidden;margin-top:12px">
         <div style="height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;width:${Math.min((acumulado/totalAnual*100),100).toFixed(1)}%;transition:width 1s ease"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:6px">
-        <span style="font-size:11px;color:rgba(147,197,253,.6)">${(acumulado/totalAnual*100).toFixed(1)}% del año</span>
+        <span style="font-size:11px;color:rgba(147,197,253,.6)">${(acumulado/totalAnual*100).toFixed(1)}% de la meta total</span>
         <span style="font-size:11px;color:rgba(147,197,253,.6)">Este mes: ${fmt(totalMes)}</span>
       </div>
     </div>
 
     <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:14px;letter-spacing:.5px">
-      PROVISIONES ${MES[fm].toUpperCase()} ${fy} — toca para ingresar monto
+      APORTES ${MES[fm].toUpperCase()} ${fy} — toca para registrar lo que apartaste
     </div>
 
     ${PROVISIONES.map(p=>{
       const montomes=s[`${fy}-${fm}-${p.id}`]||0;
       const marcado=montomes>0;
-      const acumProv=Object.keys(s).filter(k=>k.startsWith(`${fy}-`)&&k.endsWith(`-${p.id}`)).reduce((a,k)=>a+(s[k]||0),0);
-      const anualProv=p.mensual*12;
-      const pct=Math.min((acumProv/anualProv*100),100);
+      const acumProv=acumuladoProvision(p.id,!p.meta);
+      const meta=metaPeriodo(p);
+      const sugerido=aporteSugerido(p);
+      const pct=Math.min((acumProv/meta*100),100);
       return `
         <div onclick="abrirModalProv('${p.id}')" style="background:${marcado?p.color+"22":"#1e293b"};border:2px solid ${marcado?p.color:"#334155"};border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:26px">${p.icon}</span>
+              <span class="${claseIconoProvision(p)}">${iconoProvision(p)}</span>
               <div>
                 <div style="font-weight:600;font-size:14px;color:${marcado?p.color:"#f1f5f9"}">${p.label}</div>
-                <div style="font-size:11px;color:#64748b;margin-top:2px">Meta: ${fmt(p.mensual)}/mes</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px">${p.meta?`Meta ${fmt(meta)} · ${p.fechaMeta}`:`Meta ${fmt(p.mensual)}/mes`}</div>
+                <div style="font-size:10px;color:#8b9bb0;margin-top:3px">Aporte sugerido ${fmt(sugerido)}/mes</div>
               </div>
             </div>
             <div style="text-align:right">
@@ -572,8 +759,8 @@ function renderP(){
             <div style="height:100%;background:${p.color};border-radius:99px;width:${pct.toFixed(1)}%;transition:width .5s ease"></div>
           </div>
           <div style="display:flex;justify-content:space-between;margin-top:4px">
-            <span style="font-size:10px;color:#475569">Acumulado ${fy}: ${fmt(acumProv)}</span>
-            <span style="font-size:10px;color:${pct>=100?"#10b981":"#475569"}">${pct.toFixed(0)}% de ${fmt(anualProv)}</span>
+            <span style="font-size:10px;color:#475569">Acumulado: ${fmt(acumProv)}</span>
+            <span style="font-size:10px;color:${pct>=100?"#10b981":"#475569"}">${pct.toFixed(0)}% de ${fmt(meta)}</span>
           </div>
         </div>`;
     }).join("")}
@@ -581,6 +768,102 @@ function renderP(){
     <div style="background:linear-gradient(135deg,#1e40af22,#3b82f622);border:1px solid #3b82f644;border-radius:14px;padding:15px 18px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-weight:700;color:#94a3b8;font-size:13px">META MENSUAL</span>
       <span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#60a5fa">${fmt(totalMensual)}</span>
+    </div>
+  `;
+}
+
+// ── Presupuesto mensual ──────────────────────────────────
+const PLAN_INGRESO=4769952;
+const PLAN_KEY="misgastos_presupuesto";
+const PLAN_DEUDA=1000000;
+const PLAN_SALDO_DEUDA=2889002;
+const PLAN_GASTOS=[
+  {id:"mercado",label:"Mercado",icon:"🛒",categoria:"mercado",monto:1257000},
+  {id:"administracion",label:"Administración",icon:"🏢",categoria:"administracion",monto:144700},
+  {id:"agua",label:"Agua",icon:"💧",categoria:"agua",monto:55000},
+  {id:"luz",label:"Luz",icon:"💡",categoria:"luz",monto:72000},
+  {id:"vanti",label:"Gas del apartamento",icon:"🔥",categoria:"vanti",monto:39000},
+  {id:"internet",label:"Internet",icon:"📡",categoria:"internet",monto:105000},
+  {id:"gasolina",label:"Gasolina",icon:"⛽",categoria:"gasolina",monto:97000},
+  {id:"transmilenio",label:"TransMilenio",icon:"🚌",categoria:"transporte",monto:60000,descripcion:/transmi/i},
+  {id:"otros_transportes",label:"Otros transportes y parqueadero",icon:"🚘",categoria:"transporte",categoriaAlterna:"parqueadero",monto:148000,descripcion:/transmi/i,excluir:true},
+  {id:"pension_daniela",label:"Pensión Daniela",icon:"🎒",categoria:"pension",monto:180000},
+  {id:"cuota_mami",label:"Cuota Mami",icon:"👩",categoria:"mami",monto:105000},
+  {id:"recarga_celular",label:"Recarga celular",icon:"📲",categoria:"recarga_celular",monto:5000},
+  {id:"donacion",label:"Donación iglesia",icon:"⛪",categoria:"donacion_iglesia",categoriaAlterna:"otro",monto:33000,descripcion:/donaci|iglesia/i},
+  {id:"ocio",label:"Ocio",icon:"🎟️",categoria:"entretenimiento",monto:30000},
+  {id:"suscripcion_ia",label:"Suscripción IA",icon:"🤖",categoria:"suscripcion_ia",monto:35000},
+];
+function getPlan(){
+  try{return JSON.parse(localStorage.getItem(PLAN_KEY)||"{}");}catch{return {};}
+}
+function planMonto(p){const m=getPlan()[p.id];return Number.isFinite(Number(m))&&m!==""?Number(m):p.monto;}
+function guardarPlan(){
+  const state={};
+  PLAN_GASTOS.forEach(p=>{const value=Number($("plan-"+p.id)?.value);state[p.id]=Number.isFinite(value)&&value>=0?value:p.monto;});
+  localStorage.setItem(PLAN_KEY,JSON.stringify(state));
+  toast("✅ Presupuesto mensual guardado");
+  renderB();
+}
+function gastoPresupuestado(p){
+  return gf().filter(g=>{
+    const esPrincipal=g.categoria===p.categoria;
+    const esAlterna=g.categoria===p.categoriaAlterna;
+    if(!esPrincipal&&!esAlterna)return false;
+    const d=String(g.descripcion||"");
+    if(esAlterna)return p.excluir||!p.descripcion||p.descripcion.test(d);
+    if(esPrincipal&&p.categoriaAlterna&&p.descripcion)return true;
+    if(p.descripcion&&p.excluir)return !p.descripcion.test(d);
+    if(p.descripcion)return p.descripcion.test(d);
+    return true;
+  }).reduce((s,g)=>s+(Number(g.monto)||0),0);
+}
+function renderB(){
+  const el=$("pnl-b"), gastosPlan=PLAN_GASTOS.reduce((s,p)=>s+planMonto(p),0);
+  const ahorroPlan=PROVISIONES.reduce((s,p)=>s+aporteSugerido(p),0);
+  const disponible=PLAN_INGRESO-gastosPlan-PLAN_DEUDA-ahorroPlan;
+  const mesesDeuda=Math.ceil(PLAN_SALDO_DEUDA/PLAN_DEUDA);
+  const ultimoAbonoDeuda=PLAN_SALDO_DEUDA-(mesesDeuda-1)*PLAN_DEUDA;
+  const mesActual=gf();
+  el.innerHTML=`
+    <div style="background:linear-gradient(135deg,#f59e0b,#b45309);border-radius:16px;padding:20px 22px;margin-bottom:14px;color:#111827">
+      <div style="font-size:12px;font-weight:700;opacity:.7">INGRESO NETO MENSUAL</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:29px;font-weight:700;margin:3px 0">${fmt(PLAN_INGRESO)}</div>
+      <div style="font-size:11px;opacity:.72">Salario + auxilio de almuerzo, menos descuentos de nómina</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:18px">
+      ${[["Gastos planeados",gastosPlan,"#60a5fa"],["Abono a la deuda",PLAN_DEUDA,"#fb923c"],["Metas y provisiones",ahorroPlan,"#a78bfa"],["Margen estimado",disponible,disponible>=0?"#10b981":"#ef4444"]].map(([l,v,c])=>`
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:13px;padding:13px">
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:5px">${l.toUpperCase()}</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:${c}">${fmt(v)}</div>
+        </div>`).join("")}
+    </div>
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:15px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><div style="font-weight:700;font-size:14px">💳 Deuda pendiente</div><div style="font-size:11px;color:#94a3b8;margin-top:3px">Saldo: ${fmt(PLAN_SALDO_DEUDA)} · ${mesesDeuda} pagos de hasta ${fmt(PLAN_DEUDA)}/mes; último estimado: ${fmt(ultimoAbonoDeuda)}</div></div>
+        <div style="font-weight:700;color:#fb923c;white-space:nowrap">${fmt(PLAN_DEUDA)}/mes</div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:#94a3b8;margin:18px 0 8px">GASTOS DEL MES · ${MES[fm]} ${fy}</div>
+    <div style="background:#172554;border:1px solid #3b82f644;border-radius:11px;padding:11px 13px;font-size:11px;line-height:1.6;color:#bfdbfe;margin-bottom:10px"><b>Estos topes son para gastar, no para ahorrar.</b> “Gastado” muestra lo registrado este mes y “Puedes gastar” cuánto queda antes de llegar al límite. El ahorro está en la pestaña Metas.</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:10px">Edita los topes de gasto y guarda. Almuerzos y restaurantes no están incluidos en el plan.</div>
+    ${PLAN_GASTOS.map(p=>{
+      const real=gastoPresupuestado(p), limite=planMonto(p), restante=limite-real, pct=limite?Math.min(real/limite*100,100):0;
+      return `<div style="background:#1e293b;border:1px solid #334155;border-radius:13px;padding:12px 13px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="icon-3d">${p.icon}</span>
+          <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600">${p.label}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Gastado: ${fmt(real)} · ${restante>=0?`Puedes gastar ${fmt(restante)} más`:`Exceso ${fmt(-restante)}`}</div></div>
+          <label style="width:112px;flex-shrink:0"><span style="display:block;font-size:9px;color:#64748b;margin-bottom:3px">TOPE DE GASTO</span><input id="plan-${p.id}" type="number" min="0" step="1000" value="${limite}" style="width:100%;box-sizing:border-box;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px;color:#f1f5f9;font-weight:700"/></label>
+        </div>
+        <div style="height:4px;background:#0f172a;border-radius:99px;margin-top:10px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${real>limite?"#ef4444":"#10b981"};border-radius:99px"></div></div>
+      </div>`;
+    }).join("")}
+    <button onclick="guardarPlan()" class="btn-primary" style="margin:8px 0 14px">💾 Guardar topes mensuales</button>
+    <div style="background:#172554;border:1px solid #3b82f644;border-radius:12px;padding:13px 15px;font-size:11px;line-height:1.65;color:#bfdbfe">
+      Las metas y provisiones suman ${fmt(ahorroPlan)}/mes: ${fmt(1000000)} para los objetivos anteriores y ${fmt(276000)} para el fondo de ropa. Ropa se registra en <b>Metas</b>, así no aparece como tope de gasto aquí ni se cuenta dos veces. Este presupuesto parte de gastos estimados con tu hoja y puede requerir ajustes. Los consumos en “Otro” que no sean donaciones, además de otras categorías sin tope aquí, no aparecen en esta lista.
+    </div>
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:13px 15px;margin-top:10px;font-size:11px;line-height:1.65;color:#94a3b8">
+      <b style="color:#fbbf24">Por definir:</b> seguro del apartamento, mueble de cocina y estufa, emprendimiento e inversión. No están descontados de este plan; inversión queda en $0 mientras priorizas la deuda. Los descuentos de nómina ya se tuvieron en cuenta al calcular el ingreso neto.
     </div>
   `;
 }
@@ -623,7 +906,7 @@ function renderI(){
     const d=parseDate(g.fecha);
     return d.getMonth()===fm&&d.getFullYear()===fy;
   }).reduce((s,g)=>s+g.monto,0);
-  const totalProv=PROVISIONES.reduce((a,p)=>a+p.mensual,0);
+  const totalProv=PROVISIONES.reduce((a,p)=>a+aporteSugerido(p),0);
   const disponible=totalIngresos-totalGastosMes-totalProv;
   const ICONOS=["💵","💰","🏢","💻","🚗","📦","🎯","🏪","📈","🎓","🔧","💎"];
 
@@ -656,7 +939,7 @@ function renderI(){
       <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:500">ÍCONO</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
         ${ICONOS.map(ic=>`
-          <button onclick="$('ing-icon').value='${ic}';document.querySelectorAll('.icon-sel').forEach(b=>b.style.background='#0f172a');this.style.background='#f59e0b22';this.style.borderColor='#f59e0b'"
+            <button onclick="$('ing-icon').value='${ic}';document.querySelectorAll('.icon-sel').forEach(b=>b.style.background='#0f172a');this.style.background='#f59e0b22';this.style.borderColor='#f59e0b'"
             class="icon-sel"
             style="width:40px;height:40px;border-radius:10px;border:2px solid #334155;background:#0f172a;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .15s">
             ${ic}
@@ -690,7 +973,7 @@ function renderI(){
     : lista.map(i=>`
       <div style="background:#1e293b;border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:3px solid #10b981;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-size:26px">${i.icon}</span>
+              <span class="icon-3d">${i.icon}</span>
           <div>
             <div style="font-weight:600;font-size:14px">${i.nombre}</div>
             <div style="font-size:11px;color:#64748b;margin-top:2px">Mensual · ${fmt(i.monto*12)}/año</div>
@@ -726,7 +1009,7 @@ function renderI(){
 
 function setTab(t){
   tab=t;
-  ["r","g","h","p","i"].forEach(id=>{
+  ["r","g","h","b","p","i"].forEach(id=>{
     $("t-"+id).classList.toggle("active",id===t);
     $("pnl-"+id).style.display=id===t&&url?"block":"none";
   });
@@ -734,6 +1017,7 @@ function setTab(t){
     if(t==="r")renderR();
     if(t==="g")renderG();
     if(t==="h")renderH();
+    if(t==="b")renderB();
     if(t==="p")renderP();
     if(t==="i")renderI();
   }
@@ -744,11 +1028,12 @@ function render(){
   renderResumen();
   const hasUrl=!!url;
   $("pnl-setup").style.display=hasUrl?"none":"block";
-  ["r","g","h","p","i"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
+  ["r","g","h","b","p","i"].forEach(id=>$("pnl-"+id).style.display=id===tab&&hasUrl?"block":"none");
   if(hasUrl){
     if(tab==="r")renderR();
     if(tab==="g")renderG();
     if(tab==="h")renderH();
+    if(tab==="b")renderB();
     if(tab==="p")renderP();
     if(tab==="i")renderI();
   } else renderSetup();
