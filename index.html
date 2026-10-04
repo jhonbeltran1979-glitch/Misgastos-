@@ -210,13 +210,64 @@ function setConn(on,sync=false){
   $("btn-sync").style.display=on?"block":"none";
 }
 
+const CONFIG_PENDIENTE_KEY="misgastos_config_pendiente";
+function leerObjetoLocal(key){try{return JSON.parse(localStorage.getItem(key)||"null");}catch{return null;}}
+function obtenerConfigLocal(){
+  const config={};
+  const presupuesto=leerObjetoLocal(PLAN_KEY), metas=leerObjetoLocal(PROV_KEY), tasa=localStorage.getItem(PROYECCION_KEY);
+  if(presupuesto!==null)config.presupuesto=presupuesto;
+  if(metas!==null)config.metas=metas;
+  if(tasa!==null&&Number.isFinite(Number(tasa)))config.tasaProyeccion=Number(tasa);
+  return config;
+}
+function aplicarConfigLocal(config){
+  if(config.presupuesto!==undefined&&config.presupuesto!==null)localStorage.setItem(PLAN_KEY,JSON.stringify(config.presupuesto));
+  if(config.metas!==undefined&&config.metas!==null)localStorage.setItem(PROV_KEY,JSON.stringify(config.metas));
+  if(config.tasaProyeccion!==undefined&&config.tasaProyeccion!==null)localStorage.setItem(PROYECCION_KEY,String(config.tasaProyeccion));
+}
+async function enviarConfig(config){
+  const r=await fetch(url,{method:"POST",body:JSON.stringify({accion:"guardarConfig",configuracion:config})});
+  const d=await r.json();
+  return !!d.ok;
+}
+async function guardarConfigEnSheets(clave,valor){
+  const pendientes=leerObjetoLocal(CONFIG_PENDIENTE_KEY)||{};
+  pendientes[clave]=valor;
+  localStorage.setItem(CONFIG_PENDIENTE_KEY,JSON.stringify(pendientes));
+  try{
+    const ok=await enviarConfig(pendientes);
+    if(ok){
+      const restantes=leerObjetoLocal(CONFIG_PENDIENTE_KEY)||{};
+      Object.keys(pendientes).forEach(k=>{if(JSON.stringify(restantes[k])===JSON.stringify(pendientes[k]))delete restantes[k];});
+      if(Object.keys(restantes).length)localStorage.setItem(CONFIG_PENDIENTE_KEY,JSON.stringify(restantes));else localStorage.removeItem(CONFIG_PENDIENTE_KEY);
+    }
+    return ok;
+  }catch{return false;}
+}
+async function sincronizarConfigDesdeSheets(remota){
+  const config={...(remota||{})}, pendientes=leerObjetoLocal(CONFIG_PENDIENTE_KEY)||{}, local=obtenerConfigLocal();
+  let fallo=false;
+  if(Object.keys(pendientes).length){
+    try{if(await enviarConfig(pendientes)){Object.assign(config,pendientes);localStorage.removeItem(CONFIG_PENDIENTE_KEY);}else{Object.assign(config,pendientes);fallo=true;}}catch{Object.assign(config,pendientes);fallo=true;}
+  }
+  const migracion={};
+  ["presupuesto","metas","tasaProyeccion"].forEach(k=>{
+    if((config[k]===undefined||config[k]===null)&&local[k]!==undefined&&pendientes[k]===undefined)migracion[k]=local[k];
+  });
+  if(Object.keys(migracion).length){
+    try{if(await enviarConfig(migracion)){Object.assign(config,migracion);}else{Object.assign(config,migracion);Object.assign(pendientes,migracion);localStorage.setItem(CONFIG_PENDIENTE_KEY,JSON.stringify(pendientes));fallo=true;}}catch{Object.assign(config,migracion);Object.assign(pendientes,migracion);localStorage.setItem(CONFIG_PENDIENTE_KEY,JSON.stringify(pendientes));fallo=true;}
+  }
+  aplicarConfigLocal(config);
+  if(fallo)toast("Cambios guardados aquí; se sincronizarán cuando vuelva la conexión","err");
+}
+
 async function fetchGastos(u){
   if(!u)return;
   setConn(true,true);
   try{
     const r=await fetch(`${u}?t=${Date.now()}`);
     const d=await r.json();
-    if(d.gastos){gastos=[...d.gastos].reverse();render();}
+    if(d.gastos){gastos=[...d.gastos].reverse();await sincronizarConfigDesdeSheets(d.configuracion);render();}
   }catch{toast("Error conectando Sheets","err");}
   setConn(true,false);
 }
@@ -362,12 +413,13 @@ function getTasaProyeccion(){
   const guardada=Number(guardadaRaw);
   return Number.isFinite(guardada)&&guardada>=0&&guardada<=30?guardada:PROYECCION_IPC_REFERENCIA;
 }
-function guardarTasaProyeccion(){
+async function guardarTasaProyeccion(){
   const input=$("proy-tasa"), tasa=Number(input?.value);
   if(!Number.isFinite(tasa)||tasa<0||tasa>30)return toast("Ingresa un ajuste entre 0% y 30%","err");
   localStorage.setItem(PROYECCION_KEY,String(tasa));
+  const sincronizado=await guardarConfigEnSheets("tasaProyeccion",tasa);
   renderG();
-  toast("✅ Proyección anual actualizada");
+  toast(sincronizado?"✅ Proyección guardada en Sheets":"Guardada en este dispositivo; pendiente de sincronizar",sincronizado?"ok":"err");
 }
 
 function renderG(){
@@ -623,7 +675,10 @@ const PROV_KEY = "misgastos_prov";
 function getProvState(){
   try{ return JSON.parse(localStorage.getItem(PROV_KEY)||"{}"); }catch{ return {}; }
 }
-function saveProvState(s){ localStorage.setItem(PROV_KEY, JSON.stringify(s)); }
+async function saveProvState(s){
+  localStorage.setItem(PROV_KEY,JSON.stringify(s));
+  return await guardarConfigEnSheets("metas",s);
+}
 function iconoProvision(p){return p.iconHtml||p.icon;}
 function claseIconoProvision(p){return `icon-3d${p.iconHtml?" goal-icon":""}`;}
 function acumuladoProvision(id,soloAnio=false){
@@ -682,22 +737,23 @@ function abrirModalProv(id){
 
 function cerrarModalProv(){ $("modal-prov").style.display="none"; }
 
-function guardarProv(id){
+async function guardarProv(id){
   const val=parseFloat($("prov-inp").value.replace(/[^0-9.]/g,""));
   if(!val||val<=0) return toast("Ingresa un valor válido","err");
   const s=getProvState();
   s[`${fy}-${fm}-${id}`]=val;
-  saveProvState(s);
+  const sincronizado=await saveProvState(s);
   cerrarModalProv();
-  toast("✅ Ahorro registrado");
+  toast(sincronizado?"✅ Aporte guardado en Sheets":"Aporte guardado aquí; pendiente de sincronizar",sincronizado?"ok":"err");
   renderP();
 }
 
-function borrarProv(id){
+async function borrarProv(id){
   const s=getProvState();
   delete s[`${fy}-${fm}-${id}`];
-  saveProvState(s);
+  const sincronizado=await saveProvState(s);
   cerrarModalProv();
+  if(!sincronizado)toast("Cambio guardado aquí; pendiente de sincronizar","err");
   renderP();
 }
 
@@ -798,11 +854,12 @@ function getPlan(){
   try{return JSON.parse(localStorage.getItem(PLAN_KEY)||"{}");}catch{return {};}
 }
 function planMonto(p){const m=getPlan()[p.id];return Number.isFinite(Number(m))&&m!==""?Number(m):p.monto;}
-function guardarPlan(){
+async function guardarPlan(){
   const state={};
   PLAN_GASTOS.forEach(p=>{const value=Number($("plan-"+p.id)?.value);state[p.id]=Number.isFinite(value)&&value>=0?value:p.monto;});
   localStorage.setItem(PLAN_KEY,JSON.stringify(state));
-  toast("✅ Presupuesto mensual guardado");
+  const sincronizado=await guardarConfigEnSheets("presupuesto",state);
+  toast(sincronizado?"✅ Presupuesto guardado en Sheets":"Guardado aquí; pendiente de sincronizar",sincronizado?"ok":"err");
   renderB();
 }
 function gastoPresupuestado(p){
